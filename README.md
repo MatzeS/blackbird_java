@@ -1,5 +1,6 @@
 # blackbird
 
+[![Build Status](https://travis-ci.org/CodeInitiative/blackbird.svg?branch=master)](https://travis-ci.org/CodeInitiative/blackbird)
 [![Code Climate](https://codeclimate.com/github/CodeInitiative/blackbird/badges/gpa.svg)](https://codeclimate.com/github/CodeInitiative/blackbird)
 
 what the project does
