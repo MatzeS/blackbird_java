@@ -1,2 +1,4 @@
 
 avr/core/lib/* linguist-vendored
+./avr/core/lib linguist-vendored
+avr/core/lib linguist-vendored
