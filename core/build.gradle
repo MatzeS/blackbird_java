@@ -1,0 +1,22 @@
+group 'blackbird'
+version '0.1'
+
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.6.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.6.2'
+
+    compile group: 'javax.persistence', name: 'persistence-api', version: '1.0.2'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.4'
+    compile group: 'com.google.guava', name: 'guava', version: '19.0'
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.9-RC1'
+
+    compile group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.2'
+
+}

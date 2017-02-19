@@ -1,0 +1,29 @@
+# Deprecated folder
+deprecated/
+bin/
+
+# IDE
+## Eclipse
+.classpath
+.project
+.settings/
+
+##IntelliJ
+.idea
+*/.idea/
+*.iml
+
+## gradle
+.gradle
+*/build/
+
+# OS Files
+
+## OSX
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

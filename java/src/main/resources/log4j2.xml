@@ -1,0 +1,30 @@
+<Configuration status="warn" packages="blackbird.core.core.log"
+               shutdownHook="disable">
+    <!-- packages="blackbird.core.core.log" -->
+    <properties>
+        <Property name="LOG_LEVEL_PATTERN">%5p</Property>
+        <Property name="LOG_PATTERN">%d{HH:mm:ss} ${LOG_LEVEL_PATTERN} --- [%10.10t] %-30.30c{1.} : %X{prefix} %m%n</Property>
+
+    </properties>
+
+    <appenders>
+
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+    </appenders>
+
+    <loggers>
+
+        <logger name="blackbird" level="trace" additivity="false">
+            <appenderRef ref="console" level="info"/>
+        </logger>
+
+        <Root level="TRACE">
+            <appenderRef ref="console" level="INFO"/>
+        </Root>
+
+    </loggers>
+
+</Configuration>

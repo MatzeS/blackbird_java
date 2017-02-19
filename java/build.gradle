@@ -1,0 +1,38 @@
+group 'blackbird'
+version '0.1'
+
+apply plugin: 'java'
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    compile project(':core')
+
+    compile group: 'com.sparetimelabs', name: 'purejavacomm', version:'1.0.1'
+
+    //compile 'com.github.nyholku:purejavacomm:v1.0.1'
+
+    //compile group: 'org.rxtx', name: 'rxtx', version:'2.1.7'
+    //system group: 'rxtx', name: 'rxtx', version:'1.0'
+
+    compile files('lib/rxtx/RXTXcomm.jar')
+
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.6.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.6.2'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.6.2'
+
+    
+    
+/*
+    compile 'net.sourceforge.streamsupport:streamsupport:1.5'
+    compile 'net.sourceforge.streamsupport:streamsupport-cfuture:1.5'
+    compile 'net.sourceforge.streamsupport:streamsupport-atomic:1.5'
+    compile 'net.sourceforge.streamsupport:streamsupport-flow:1.5'
+    compile 'net.sourceforge.streamsupport:streamsupport-literal:1.5'
+*/
+
+}

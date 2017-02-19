@@ -1,0 +1,4 @@
+rootProject.name = 'java'
+
+include ':core'
+project(':core').projectDir = new File('../core')
