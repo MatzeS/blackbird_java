@@ -1,6 +1,6 @@
 # blackbird
 
-[![Code Climate](https://codeclimate.com/github/MatzeS/blackbird/badges/gpa.svg)](https://codeclimate.com/github/MatzeS/blackbird)
+[![Code Climate](https://codeclimate.com/github/CodeInitiative/blackbird/badges/gpa.svg)](https://codeclimate.com/github/CodeInitiative/blackbird)
 
 what the project does
 
