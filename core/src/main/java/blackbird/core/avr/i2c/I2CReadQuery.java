@@ -1,9 +1,9 @@
 package blackbird.core.avr.i2c;
 
+import java.io.ByteArrayOutputStream;
+
 import blackbird.core.avr.CommandBytes;
 import blackbird.core.avr.packets.TransmittableAVRPacket;
-
-import java.io.ByteArrayOutputStream;
 
 public class I2CReadQuery extends TransmittableAVRPacket {
 

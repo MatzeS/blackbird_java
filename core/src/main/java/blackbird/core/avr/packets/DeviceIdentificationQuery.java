@@ -1,8 +1,8 @@
 package blackbird.core.avr.packets;
 
-import blackbird.core.avr.CommandBytes;
-
 import java.io.ByteArrayOutputStream;
+
+import blackbird.core.avr.CommandBytes;
 
 public class DeviceIdentificationQuery extends TransmittableAVRPacket {
 

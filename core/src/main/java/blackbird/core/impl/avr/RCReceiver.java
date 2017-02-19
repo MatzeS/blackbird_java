@@ -1,16 +1,20 @@
 package blackbird.core.impl.avr;
 
-import blackbird.core.*;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.function.Predicate;
+
+import blackbird.core.Blackbird;
+import blackbird.core.ComponentImplementation;
+import blackbird.core.DInterface;
+import blackbird.core.Device;
+import blackbird.core.PacketConnection;
 import blackbird.core.avr.packets.RCReceiveQuery;
 import blackbird.core.avr.packets.RCReceiveResponse;
 import blackbird.core.events.PacketReceivedEvent;
 import blackbird.core.ports.ParentDevicePort;
 import blackbird.core.rmi.Remote;
 import blackbird.core.util.ListenerList;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.function.Predicate;
 
 public class RCReceiver extends Device {
 

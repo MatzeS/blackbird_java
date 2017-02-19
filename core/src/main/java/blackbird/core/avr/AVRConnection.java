@@ -1,12 +1,5 @@
 package blackbird.core.avr;
 
-import blackbird.core.Connection;
-import blackbird.core.Packet;
-import blackbird.core.PacketConnection;
-import blackbird.core.avr.DS18B20.DS18B20Parser;
-import blackbird.core.avr.i2c.I2CParser;
-import blackbird.core.avr.packets.TransmittableAVRPacket;
-import blackbird.core.avr.parsers.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +8,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.function.Predicate;
+
+import blackbird.core.Connection;
+import blackbird.core.Packet;
+import blackbird.core.PacketConnection;
+import blackbird.core.avr.DS18B20.DS18B20Parser;
+import blackbird.core.avr.i2c.I2CParser;
+import blackbird.core.avr.packets.TransmittableAVRPacket;
+import blackbird.core.avr.parsers.BasicPinParser;
+import blackbird.core.avr.parsers.CapSensePinParser;
+import blackbird.core.avr.parsers.CommonInterruptParser;
+import blackbird.core.avr.parsers.DeviceIdentificationParser;
+import blackbird.core.avr.parsers.IRParser;
+import blackbird.core.avr.parsers.PacketParser;
+import blackbird.core.avr.parsers.RCReceiveParser;
 
 public abstract class AVRConnection extends PacketConnection {
 

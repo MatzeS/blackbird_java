@@ -1,10 +1,10 @@
 package blackbird.core.impl;
 
+import java.util.Objects;
+
 import blackbird.core.DInterface;
 import blackbird.core.exception.ImplementationFailedException;
 import blackbird.core.ports.ParentDevicePort;
-
-import java.util.Objects;
 
 public class AukeySocket extends RemoteSocket {
 

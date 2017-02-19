@@ -1,10 +1,10 @@
 package blackbird.core;
 
-import blackbird.core.exception.ImplementationFailedException;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import blackbird.core.exception.ImplementationFailedException;
 
 /**
  * DIBuilders are used by blackbird to create implementations for devices.

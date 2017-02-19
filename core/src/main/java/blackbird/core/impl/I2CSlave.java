@@ -1,11 +1,11 @@
 package blackbird.core.impl;
 
+import java.io.IOException;
+import java.util.Objects;
+
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
-
-import java.io.IOException;
-import java.util.Objects;
 
 import static blackbird.core.avr.ByteHelper.setBit;
 

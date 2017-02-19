@@ -1,10 +1,15 @@
 package blackbird.core.impl;
 
-import blackbird.core.*;
+import java.io.IOException;
+
+import blackbird.core.ComponentImplementation;
+import blackbird.core.DIState;
+import blackbird.core.DInterface;
+import blackbird.core.DPort;
+import blackbird.core.Device;
+import blackbird.core.HostDevice;
 import blackbird.core.ports.LocalHostDevicePort;
 import blackbird.core.serial.SerialConnection;
-
-import java.io.IOException;
 
 public class SerialDevice extends Device {
 

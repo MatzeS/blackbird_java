@@ -1,5 +1,8 @@
 package blackbird.core.impl;
 
+import java.io.IOException;
+import java.io.Serializable;
+
 import blackbird.core.Blackbird;
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.ComponentImplementation;
@@ -8,9 +11,6 @@ import blackbird.core.exception.ImplementationFailedException;
 import blackbird.core.ports.ParentDevicePort;
 import blackbird.core.rmi.Remote;
 import blackbird.core.util.ListenerList;
-
-import java.io.IOException;
-import java.io.Serializable;
 
 public class MPR121 extends I2CSlave {
 

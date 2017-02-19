@@ -1,10 +1,10 @@
 package blackbird.core.events;
 
-import blackbird.core.Packet;
-import blackbird.core.PacketConnection;
-
 import java.io.IOException;
 import java.util.EventObject;
+
+import blackbird.core.Packet;
+import blackbird.core.PacketConnection;
 
 /**
  * An event which indicates a packet was received by a connection.

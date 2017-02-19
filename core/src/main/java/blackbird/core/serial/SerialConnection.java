@@ -1,10 +1,10 @@
 package blackbird.core.serial;
 
-import blackbird.core.Connection;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import blackbird.core.Connection;
 
 /**
  * A serial connection using a the {@link SerialPort} interface.

@@ -1,6 +1,10 @@
 package blackbird.core.ports;
 
-import blackbird.core.*;
+import blackbird.core.DInterface;
+import blackbird.core.DPort;
+import blackbird.core.Device;
+import blackbird.core.GenericDIBuilder;
+import blackbird.core.HostDevice;
 
 /**
  * This ports forces the implementation to be on the defined host.

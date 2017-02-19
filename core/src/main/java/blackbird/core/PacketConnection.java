@@ -1,10 +1,5 @@
 package blackbird.core;
 
-import blackbird.core.events.CloseEvent;
-import blackbird.core.events.PacketReceivedEvent;
-import blackbird.core.exception.NoReplyException;
-import blackbird.core.util.ListenerList;
-import blackbird.core.util.TypeFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,6 +8,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.util.function.Predicate;
+
+import blackbird.core.events.CloseEvent;
+import blackbird.core.events.PacketReceivedEvent;
+import blackbird.core.exception.NoReplyException;
+import blackbird.core.util.ListenerList;
+import blackbird.core.util.TypeFilter;
 
 /**
  * This class establishes the event driven {@link Packet} layer on top of the genuine {@link Connection}.

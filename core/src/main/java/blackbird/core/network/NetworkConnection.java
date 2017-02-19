@@ -1,11 +1,11 @@
 package blackbird.core.network;
 
-import blackbird.core.Connection;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+
+import blackbird.core.Connection;
 
 /**
  * Connection implementation for communication via network sockets.

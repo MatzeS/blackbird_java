@@ -1,5 +1,7 @@
 package blackbird.core.impl.avr;
 
+import java.io.IOException;
+
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.avr.ByteHelper;
@@ -8,8 +10,6 @@ import blackbird.core.avr.DS18B20.DS18B20ReadResponse;
 import blackbird.core.impl.OneWireDevice;
 import blackbird.core.impl.TemperatureSensor;
 import blackbird.core.ports.ParentDevicePort;
-
-import java.io.IOException;
 
 public class DS18B20 extends TemperatureSensor implements OneWireDevice {
 
@@ -20,16 +20,16 @@ public class DS18B20 extends TemperatureSensor implements OneWireDevice {
         return address;
     }
 
+    public void setAddress(byte[] address) {
+        setAddress(ByteHelper.decode8Byte(address));
+    }
+
     public void setAddress(long address) {
         this.address = address;
     }
 
     public void setAddress(String address) {
         setAddress(ByteHelper.hexStringToByteArray(address));
-    }
-
-    public void setAddress(byte[] address) {
-        setAddress(ByteHelper.decode8Byte(address));
     }
 
     public interface Interface extends TemperatureSensor.Interface {

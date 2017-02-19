@@ -1,11 +1,11 @@
 package blackbird.core.avr.parsers;
 
+import java.util.Arrays;
+
 import blackbird.core.Packet;
 import blackbird.core.avr.CommandBytes;
 import blackbird.core.avr.packets.BasicPinQuery;
 import blackbird.core.avr.packets.BasicPinResponse;
-
-import java.util.Arrays;
 
 public class BasicPinParser extends PacketParser {
 

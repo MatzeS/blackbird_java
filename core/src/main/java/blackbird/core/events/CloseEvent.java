@@ -1,9 +1,9 @@
 package blackbird.core.events;
 
+import java.util.EventObject;
+
 import blackbird.core.CloseReason;
 import blackbird.core.Connection;
-
-import java.util.EventObject;
 
 /**
  * An event providing information the connection closure.

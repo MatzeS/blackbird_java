@@ -1,9 +1,9 @@
 package blackbird.core.exception;
 
+import java.io.IOException;
+
 import blackbird.core.Packet;
 import blackbird.core.PacketConnection;
-
-import java.io.IOException;
 
 /**
  * Signals for a send request there was no answer received (due the given timeout).

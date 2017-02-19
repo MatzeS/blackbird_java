@@ -1,5 +1,7 @@
 # blackbird
 
+[![Code Climate](https://codeclimate.com/github/MatzeS/blackbird/badges/gpa.svg)](https://codeclimate.com/github/MatzeS/blackbird)
+
 what the project does
 
 
@@ -22,7 +24,7 @@ how the user can get started
 
 blackbird is separated into many packets to be fully scalable on each platform and device.
 
-![packet overview](doc/packet-overview.svg)
+![packet overview](./doc/packet-overview.png)
 
 ### core
 The core package contains all platform independent Java implementation.

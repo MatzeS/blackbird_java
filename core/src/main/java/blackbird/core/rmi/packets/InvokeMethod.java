@@ -1,11 +1,11 @@
 package blackbird.core.rmi.packets;
 
-import blackbird.core.Packet;
-import blackbird.core.rmi.MethodIdentifier;
-
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
+
+import blackbird.core.Packet;
+import blackbird.core.rmi.MethodIdentifier;
 
 public class InvokeMethod {
 

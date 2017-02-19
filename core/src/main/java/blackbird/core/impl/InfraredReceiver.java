@@ -1,14 +1,14 @@
 package blackbird.core.impl;
 
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
 import blackbird.core.Blackbird;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
 import blackbird.core.rmi.Remote;
 import blackbird.core.util.ListenerList;
-
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 
 public class InfraredReceiver extends Device {

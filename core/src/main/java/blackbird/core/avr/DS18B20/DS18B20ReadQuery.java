@@ -1,9 +1,9 @@
 package blackbird.core.avr.DS18B20;
 
+import java.io.ByteArrayOutputStream;
+
 import blackbird.core.avr.CommandBytes;
 import blackbird.core.avr.packets.TransmittableAVRPacket;
-
-import java.io.ByteArrayOutputStream;
 
 import static blackbird.core.avr.ByteHelper.encode;
 

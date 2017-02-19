@@ -1,12 +1,12 @@
 package blackbird.core.impl;
 
+import java.io.IOException;
+
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.serial.SerialConnection;
 import blackbird.core.util.Color;
-
-import java.io.IOException;
 
 public class LightController extends SerialDevice {
 

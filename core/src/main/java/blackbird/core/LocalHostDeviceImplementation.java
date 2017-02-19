@@ -1,7 +1,8 @@
 package blackbird.core;
 
-import blackbird.core.exception.ImplementationFailedException;
 import org.apache.commons.lang3.NotImplementedException;
+
+import blackbird.core.exception.ImplementationFailedException;
 
 /**
  * The basic local host device implementation.

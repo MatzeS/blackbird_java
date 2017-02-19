@@ -1,14 +1,21 @@
 package blackbird.core;
 
-import blackbird.core.exception.ImplementationNotAvailableException;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimaps;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import blackbird.core.exception.ImplementationNotAvailableException;
 
 /**
  * This singleton is the main handle to work with blackbird.

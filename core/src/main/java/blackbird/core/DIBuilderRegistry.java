@@ -1,11 +1,20 @@
 package blackbird.core;
 
-import blackbird.core.impl.*;
-import blackbird.core.impl.avr.*;
-import blackbird.core.ports.LocalHostDevicePort;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import blackbird.core.impl.AppleRemote;
+import blackbird.core.impl.AukeyRemote;
+import blackbird.core.impl.AukeySocket;
+import blackbird.core.impl.LightController;
+import blackbird.core.impl.MCP23017;
+import blackbird.core.impl.avr.AVRDevice;
+import blackbird.core.impl.avr.AVRI2CSlaveImplementation;
+import blackbird.core.impl.avr.DS18B20;
+import blackbird.core.impl.avr.InfraredReceiverImplementation;
+import blackbird.core.impl.avr.RCReceiver;
+import blackbird.core.impl.avr.RCSocketImplementation;
+import blackbird.core.ports.LocalHostDevicePort;
 
 /**
  * Register all DIBuilders to this registry so they can be used by blackbird.

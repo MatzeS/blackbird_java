@@ -1,11 +1,11 @@
 package blackbird.core.impl.avr;
 
+import java.io.IOException;
+
 import blackbird.core.DInterface;
 import blackbird.core.avr.packets.RCSwitchQuery;
 import blackbird.core.impl.RCSocket;
 import blackbird.core.ports.ParentDevicePort;
-
-import java.io.IOException;
 
 import static blackbird.core.impl.Socket.ON;
 

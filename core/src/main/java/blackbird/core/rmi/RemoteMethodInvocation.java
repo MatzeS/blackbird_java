@@ -1,10 +1,5 @@
 package blackbird.core.rmi;
 
-
-import blackbird.core.HostConnection;
-import blackbird.core.events.CloseEvent;
-import blackbird.core.events.PacketReceivedEvent;
-import blackbird.core.rmi.packets.InvokeMethod;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,8 +9,17 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import blackbird.core.HostConnection;
+import blackbird.core.events.CloseEvent;
+import blackbird.core.events.PacketReceivedEvent;
+import blackbird.core.rmi.packets.InvokeMethod;
 
 public class RemoteMethodInvocation {
 

@@ -1,5 +1,7 @@
 package blackbird.core.impl.avr;
 
+import java.io.IOException;
+
 import blackbird.core.DInterface;
 import blackbird.core.avr.AVRConnection;
 import blackbird.core.avr.i2c.I2CReadQuery;
@@ -7,8 +9,6 @@ import blackbird.core.avr.i2c.I2CReadResponse;
 import blackbird.core.avr.i2c.I2CWriteQuery;
 import blackbird.core.impl.I2CSlave;
 import blackbird.core.ports.ParentDevicePort;
-
-import java.io.IOException;
 
 public class AVRI2CSlaveImplementation extends I2CSlave.Implementation {
 

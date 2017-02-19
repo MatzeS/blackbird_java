@@ -1,12 +1,12 @@
 package blackbird.core.impl;
 
+import java.io.IOException;
+
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
 import blackbird.core.exception.ImplementationFailedException;
 import blackbird.core.ports.ParentDevicePort;
-
-import java.io.IOException;
 
 import static blackbird.core.avr.DigitalPinValue.HIGH;
 import static blackbird.core.avr.DigitalPinValue.LOW;

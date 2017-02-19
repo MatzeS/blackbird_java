@@ -1,10 +1,10 @@
 package blackbird.core.serial;
 
-import blackbird.core.CloseReason;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import blackbird.core.CloseReason;
 
 /**
  * This class abstracts SerialPorts defined in concrete librarys (RXTX/PureJavaComm).

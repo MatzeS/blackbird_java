@@ -1,5 +1,7 @@
 package blackbird.core.impl.avr;
 
+import java.io.IOException;
+
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.GenericDIBuilder;
@@ -11,8 +13,6 @@ import blackbird.core.avr.packets.DeviceIdentificationQuery;
 import blackbird.core.avr.packets.DeviceIdentificationResponse;
 import blackbird.core.exception.ImplementationFailedException;
 import blackbird.core.impl.SerialDevice;
-
-import java.io.IOException;
 
 public class AVRDevice extends SerialDevice {
 

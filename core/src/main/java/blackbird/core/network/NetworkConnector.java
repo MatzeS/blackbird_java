@@ -1,10 +1,5 @@
 package blackbird.core.network;
 
-import blackbird.core.GenericConnector;
-import blackbird.core.HostDevice;
-import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.exception.NoConnectionException;
-import blackbird.core.util.MultiException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -15,6 +10,12 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
+
+import blackbird.core.GenericConnector;
+import blackbird.core.HostDevice;
+import blackbird.core.exception.ImplementationFailedException;
+import blackbird.core.exception.NoConnectionException;
+import blackbird.core.util.MultiException;
 
 /**
  * A connector using the default java network communication through {@link Socket}s.

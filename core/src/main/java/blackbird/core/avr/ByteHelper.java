@@ -5,14 +5,6 @@ import java.nio.ByteOrder;
 
 public class ByteHelper {
 
-    public static byte setBit(byte byteValue, int bit, boolean highLevel) {
-        if (highLevel) {
-            return (byte) (byteValue | bitMaskHigh(bit));
-        } else {
-            return (byte) (byteValue & bitMaskLow(bit));
-        }
-    }
-
     private static byte bitMaskHigh(int bit) {
         return (byte) (1 << bit);
     }
@@ -68,6 +60,14 @@ public class ByteHelper {
                     + Character.digit(s.charAt(i + 1), 16));
         }
         return data;
+    }
+
+    public static byte setBit(byte byteValue, int bit, boolean highLevel) {
+        if (highLevel) {
+            return (byte) (byteValue | bitMaskHigh(bit));
+        } else {
+            return (byte) (byteValue & bitMaskLow(bit));
+        }
     }
 
     public static boolean testBit(int i, int index) {

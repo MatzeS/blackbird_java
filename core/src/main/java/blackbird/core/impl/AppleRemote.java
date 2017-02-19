@@ -1,11 +1,16 @@
 package blackbird.core.impl;
 
-import blackbird.core.*;
-import blackbird.core.util.ListenerList;
-
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.function.Predicate;
+
+import blackbird.core.Blackbird;
+import blackbird.core.ComponentDIBuilder;
+import blackbird.core.ComponentImplementation;
+import blackbird.core.DInterface;
+import blackbird.core.DPort;
+import blackbird.core.Device;
+import blackbird.core.util.ListenerList;
 
 
 public class AppleRemote extends Device {

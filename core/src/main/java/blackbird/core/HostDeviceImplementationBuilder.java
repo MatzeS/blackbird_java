@@ -1,5 +1,12 @@
 package blackbird.core;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import blackbird.core.events.PacketReceivedEvent;
 import blackbird.core.exception.ImplementationFailedException;
 import blackbird.core.exception.NoReplyException;
@@ -7,12 +14,6 @@ import blackbird.core.network.NetworkConnector;
 import blackbird.core.packets.HandshakePacket;
 import blackbird.core.rmi.RemoteMethodInvocation;
 import blackbird.core.util.MultiException;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A builder providing interfaces of other host devices using {@link HostConnection}s.
@@ -42,12 +43,6 @@ public class HostDeviceImplementationBuilder extends GenericDIBuilder<HostDevice
 
     }
 
-    private int getLocalDeviceImplementationID() {
-        if (localDeviceImplementationID == 0)
-            localDeviceImplementationID = rmi.registerObject(blackbird.getLocalDeviceImplementation());
-        return localDeviceImplementationID;
-    }
-
     public void addConnector(Connector connector) {
         connectors.add(connector);
     }
@@ -70,6 +65,11 @@ public class HostDeviceImplementationBuilder extends GenericDIBuilder<HostDevice
                 + MultiException.generateMultipleExceptionText(exceptionList));
     }
 
+    private int getLocalDeviceImplementationID() {
+        if (localDeviceImplementationID == 0)
+            localDeviceImplementationID = rmi.registerObject(blackbird.getLocalDeviceImplementation());
+        return localDeviceImplementationID;
+    }
 
     private HandshakePacket performHandshake(HostConnection hostConnection) throws IOException {
         return performHandshake(hostConnection, DEFAULT_HANDSHAKE_TIMEOUT);
