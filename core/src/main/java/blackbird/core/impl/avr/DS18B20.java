@@ -20,6 +20,10 @@ public class DS18B20 extends TemperatureSensor implements OneWireDevice {
         return address;
     }
 
+    public void setAddress(String address) {
+        setAddress(ByteHelper.hexStringToByteArray(address));
+    }
+
     public void setAddress(byte[] address) {
         setAddress(ByteHelper.decode8Byte(address));
     }
@@ -28,14 +32,11 @@ public class DS18B20 extends TemperatureSensor implements OneWireDevice {
         this.address = address;
     }
 
-    public void setAddress(String address) {
-        setAddress(ByteHelper.hexStringToByteArray(address));
-    }
-
     public interface Interface extends TemperatureSensor.Interface {
 
         @Override
         DS18B20 getDevice();
+
     }
 
     public static class Implementation extends ComponentImplementation<DS18B20, DInterface>
@@ -50,7 +51,7 @@ public class DS18B20 extends TemperatureSensor implements OneWireDevice {
         }
 
         @Override
-        public float getTemperature() {
+        public double getTemperature() {
             try {
                 return avr.getAVRConnection().sendAndReceive(
                         new DS18B20ReadQuery(getDevice().address),

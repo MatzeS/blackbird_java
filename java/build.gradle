@@ -4,15 +4,13 @@ version '0.1'
 apply plugin: 'java'
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     compile project(':core')
 
-    compile group: 'com.sparetimelabs', name: 'purejavacomm', version:'1.0.1'
+    compile "com.github.purejavacomm:purejavacomm:1.0.1.RELEASE"
 
     //compile 'com.github.nyholku:purejavacomm:v1.0.1'
 

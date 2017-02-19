@@ -9,15 +9,6 @@
 namespace DS18B20 {
 
     class Handler : public AbstractHandler {
-    private:
-        //uint8_t oneWirePins[MAX_SENSORS];
-        //OneWire *oneWires[MAX_SENSORS];
-        //DallasTemperature *sensors[MAX_SENSORS];
-
-        //uint8_t getFreeSensorIndex();
-
-        //DallasTemperature *getInstanceByPin(uint8_t pin);
-
     public:
         Handler();
 

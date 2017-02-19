@@ -1,14 +1,21 @@
 package blackbird.java.serial;
 
-import blackbird.core.CloseReason;
-import blackbird.core.serial.AbstractSerialPort;
-import purejavacomm.*;
+import purejavacomm.CommPortIdentifier;
+import purejavacomm.NoSuchPortException;
+import purejavacomm.PortInUseException;
+import purejavacomm.SerialPort;
+import purejavacomm.SerialPortEvent;
+import purejavacomm.SerialPortEventListener;
+import purejavacomm.UnsupportedCommOperationException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.TooManyListenersException;
+
+import blackbird.core.CloseReason;
+import blackbird.core.serial.AbstractSerialPort;
 
 public class PJCSerialPort extends AbstractSerialPort implements SerialPortEventListener {
 

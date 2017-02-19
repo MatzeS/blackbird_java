@@ -1,5 +1,7 @@
 package blackbird.java.serial;
 
+import java.io.IOException;
+
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.Connection;
 import blackbird.core.DInterface;
@@ -8,8 +10,6 @@ import blackbird.core.exception.NoConnectionException;
 import blackbird.core.impl.SerialDevice;
 import blackbird.core.serial.SerialConnection;
 import blackbird.core.serial.SerialPort;
-
-import java.io.IOException;
 
 public class SerialDeviceImplementationBuilder
         extends ComponentDIBuilder<SerialDevice, SerialDevice.Implementation, SerialDevice.Port, DInterface> {
