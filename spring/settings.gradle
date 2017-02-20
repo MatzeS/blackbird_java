@@ -1,0 +1,10 @@
+rootProject.name = 'spring'
+
+//include blackbird core
+include ':core'
+project(':core').projectDir = new File('../core')
+
+//include blackbird java
+include ':java'
+project(':java').projectDir = new File('../java')
+
