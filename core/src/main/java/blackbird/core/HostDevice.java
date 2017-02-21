@@ -52,6 +52,8 @@ public class HostDevice extends Device {
         @Override
         HostDevice getDevice();
 
+        boolean hasDeviceImplementation()
+
         <T> T interfaceDevice(Device device, Class<T> interfaceType);
 
     }

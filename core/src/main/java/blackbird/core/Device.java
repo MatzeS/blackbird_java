@@ -10,11 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
 
+import blackbird.core.ImplementationGraph.Node;
 import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.util.MultiException;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * A device can be any type of hardware represented in the blackbird system.
@@ -72,39 +71,6 @@ public abstract class Device implements Serializable {
         uiData.put("iconName", "ic_integrated_circuit");
     }
 
-    public <T> T buildImplementation(Class<T> implementationType) {
-        return buildImplementation(implementationType, getPort());
-    }
-
-    public synchronized <T> T buildImplementation(Class<T> implementationType, DPort port) {
-        checkArgument(implementationType != null, "implementationType must not be null");
-
-        logger.trace("building {} / {} / {}", this, implementationType, port);
-
-        List<Exception> exceptionList = new ArrayList<>();
-        for (DIBuilder builder : DIBuilderRegistry.getBuilders())
-            try {
-                logger.trace("attempting {} on {} / {} / {}", builder.getClass().getName(), this, implementationType, port);
-
-                DInterface implementation = builder.buildImplementationRecursionSave(this, implementationType, port);
-                logger.info("build with {} on {} / {} / {}", builder.getClass().getName(), this, implementationType, port);
-
-                if (implementation.getHost().isHere())
-                    registerImplementation(implementation);
-
-                return (T) implementation;
-
-            } catch (ImplementationFailedException e) { //TODO failures
-                logger.trace("build failed," + builder + "/ " + this + "/" + port);
-                if (!(e.getCause() instanceof IllegalArgumentException || e.getMessage().contains("recursive")))
-                    exceptionList.add(e);
-            }
-
-        throw new ImplementationFailedException("no builder succeeded for " + this + "/"
-                + implementationType.getName() + "/" + (port != null ? port.getClass().getName() : "no port")
-                + MultiException.generateMultipleExceptionText(exceptionList));
-    }
-
     /**
      * The equals property is internally used for device comparison and identification.
      * Equal devices are might be merged or overwritten.<br>
@@ -122,18 +88,6 @@ public abstract class Device implements Serializable {
             return false;
         Device device = (Device) o;
         return Objects.equals(name, device.name);
-    }
-
-    private synchronized <T> T getImplementationObject(Class<T> implementationType) {
-        ImplementationGraph.Node node = null;
-
-        if (implementationGraph != null)
-            node = implementationGraph.find(implementationType);
-
-        if (node != null)
-            return (T) node.getImplementation();
-
-        return buildImplementation(implementationType);
     }
 
     public String getName() {
@@ -170,33 +124,93 @@ public abstract class Device implements Serializable {
         return Objects.hash(name);
     }
 
-    public synchronized <T> T getInterface(Class<T> interfaceType) {
-        return getImplementationObject(interfaceType);
-    }
-
-    public synchronized <T> T getImplementation(Class<T> interfaceType) {
-        getInterface(DInterface.class);
-        if (implementationGraph == null)
-            throw new ImplementationFailedException("implementation is not on this device"); // TODO check
-
-        return getImplementationObject(interfaceType);
-    }
-
-    private void registerImplementation(DInterface implementation) {
-        if (!implementation.getHost().isHere()) {
-            logger.warn("trying to register implementation not for this blackbird instance, rejected"); //TODO remove?
-            return;
-        }
-
-        if (implementationGraph == null)
-            implementationGraph = new ImplementationGraph();
-
-        implementationGraph.add(implementation);
-    }
-
     @Override
     public String toString() {
         return getToken();
     }
+
+
+    public synchronized <T> T getInterface(Class<T> interfaceType) {
+        return getImplementation(interfaceType);
+    }
+
+    public synchronized <T> T getImplementation(Class<T> implementationType) {
+
+        // if locally present take it or build on top
+        if (isImplemented()) {
+            Node implNode = implementationGraph.find(implementationType);
+            if (implNode != null)
+                return (T) implNode.getImplementation();
+            else
+                return buildImplementation(implementationType); // is this safe?
+        }
+
+        T remoteImpl = getRemoteImplementation(implementationType);
+        if (remoteImpl != null)
+            return remoteImpl;
+
+
+        // if nowhere present build it, at the best location
+
+        if(!implementationType.isInterface() && isImplementable())
+            return buildImplementation(implementationType);
+
+        HostDevice idealHost = getIdealHost();
+        if(idealHost.isHere())
+            return buildImplementation(implementationType);
+        else
+            return idealHost.getInterface(HostDevice.Interface.class).interfaceDevice(this, implementationType);
+
+    }
+
+    private HostDevice getIdealHost(){
+
+
+    }
+
+    private boolean isImplementable(){
+        return getPossibleHosts().stream().filter(HostDevice::isHere).count() > 0;
+    }
+
+    private boolean isImplemented() {
+        return implementationGraph != null;
+    }
+
+    private synchronized <T> T buildImplementation(Class<T> implementationType) {
+        if(!isImplementable())
+            throw new ImplementationFailedException("device can not be build here");
+
+        
+
+
+    }
+
+    private List<HostDevice> getPossibleHosts(){
+        return getPorts().stream()
+                .map(DPort::getPossibleHosts)
+                .reduce(new ArrayList<>(), (a, b) -> {
+                    a.addAll(b);
+                    return a;
+                });
+    }
+
+    public synchronized <T> T getRemoteImplementation(Class<T> interfaceType) {
+
+        List<HostDevice> hosts = getPossibleHosts().stream()
+                .filter(host -> !host.isHere()) //TODO remove
+                .filter(host -> host.getInterface(HostDevice.Interface.class).hasDeviceImplementation())
+                .collect(Collectors.toList());
+        HostDevice host = hosts.get(0);
+
+        if (hosts.size() > 1)
+            throw new RuntimeException("more than one host implements a device, inconsistent system state");
+
+        if (hosts.isEmpty())
+            return null;
+
+        return host.getInterface(HostDevice.Interface.class).interfaceDevice(this, interfaceType);
+
+    }
+
 
 }
