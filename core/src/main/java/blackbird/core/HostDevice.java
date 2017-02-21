@@ -31,6 +31,10 @@ public class HostDevice extends Device {
         return ID;
     }
 
+    public boolean isHere() {
+
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), ID);
@@ -47,8 +51,6 @@ public class HostDevice extends Device {
 
         @Override
         HostDevice getDevice();
-
-        int getImplementationDistanceTo(Device device);
 
         <T> T interfaceDevice(Device device, Class<T> interfaceType);
 

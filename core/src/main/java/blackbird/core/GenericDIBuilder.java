@@ -15,7 +15,7 @@ import blackbird.core.util.Generics;
  * @param <I> the produced interface
  * @param <P> the accepted port
  */
-public abstract class GenericDIBuilder<D, I, P> extends DIBuilder {
+public abstract class GenericDIBuilder<D extends Device, I, P> extends DIBuilder {
 
     private Class<D> deviceType;
 

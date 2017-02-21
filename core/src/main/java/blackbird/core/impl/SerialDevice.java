@@ -8,7 +8,6 @@ import blackbird.core.DInterface;
 import blackbird.core.DPort;
 import blackbird.core.Device;
 import blackbird.core.HostDevice;
-import blackbird.core.ports.LocalHostDevicePort;
 import blackbird.core.serial.SerialConnection;
 
 public class SerialDevice extends Device {
@@ -61,10 +60,12 @@ public class SerialDevice extends Device {
 
         private static final long serialVersionUID = -9135816665280984514L;
 
+        private HostDevice host;
         private String port;
         private int baudRate;
 
-        public Port(String port, int baudRate) {
+        public Port(HostDevice host, String port, int baudRate) {
+            this.host = host;
             this.port = port;
             this.baudRate = baudRate;
         }
@@ -73,12 +74,12 @@ public class SerialDevice extends Device {
             return baudRate;
         }
 
-        public String getPort() {
-            return port;
+        public HostDevice getHost() {
+            return host;
         }
 
-        public static DPort create(HostDevice host, String port, int baudRate) {
-            return new LocalHostDevicePort(host, new Port(port, baudRate));
+        public String getPort() {
+            return port;
         }
 
     }

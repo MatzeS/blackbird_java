@@ -7,6 +7,8 @@ import java.io.Serializable;
  * <p>
  * Typically connection parameters, hardware configuration or the device address.
  *
+ * It is consumed by the DIBuilder to produce a DeviceImplementation
+ *
  * @see DIBuilder
  */
 public class DPort implements Serializable {

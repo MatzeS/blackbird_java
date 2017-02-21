@@ -1,13 +1,10 @@
 package blackbird.core.impl;
 
 import java.time.Duration;
-import java.util.function.Predicate;
 
-import blackbird.core.Blackbird;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
 import blackbird.core.interconnect.HysteresisPollingTrigger;
-import blackbird.core.interconnect.PollingTrigger;
 
 public class TemperatureSensor extends Device {
 
@@ -36,7 +33,7 @@ public class TemperatureSensor extends Device {
     }
 
     public static double getTemperature(TemperatureSensor sensor) {
-        return Blackbird.getInstance().interfaceDevice(sensor, TemperatureSensor.Interface.class).getTemperature();
+        return sensor.getInterface(Interface.class).getTemperature();
     }
 
     public interface Interface extends DInterface {

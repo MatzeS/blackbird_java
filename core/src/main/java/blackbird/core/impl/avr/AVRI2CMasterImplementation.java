@@ -31,7 +31,7 @@ public class AVRI2CMasterImplementation extends Implementation {
         public AVRI2CMasterImplementation build(AVRDevice device, DPort port, DInterface componentInterface) {
 
             AVRDevice.Implementation avrImplementation =
-                    blackbird.implementDevice(device, AVRDevice.Implementation.class);
+                    device.getImplementation(AVRDevice.Implementation.class);
 
             return new AVRI2CMasterImplementation(componentInterface, avrImplementation);
         }

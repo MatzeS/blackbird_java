@@ -12,8 +12,6 @@ import blackbird.core.exception.ImplementationFailedException;
 public class LocalHostDeviceImplementation
         extends ComponentImplementation<HostDevice, DInterface> implements HostDevice.Interface {
 
-    private Blackbird blackbird = Blackbird.getInstance();
-
     private LocalHostDeviceImplementation(DInterface component) {
         super(component);
     }
@@ -24,17 +22,8 @@ public class LocalHostDeviceImplementation
     }
 
     @Override
-    public int getImplementationDistanceTo(Device device) {
-        //TODO
-        if (blackbird.getDeviceManager(device) != null)
-            return 0;
-
-        return 1;
-    }
-
-    @Override
     public <T> T interfaceDevice(Device device, Class<T> interfaceType) {
-        return blackbird.interfaceDevice(device, interfaceType);
+        return device.getInterface(interfaceType);
     }
 
     public static class Builder extends ComponentDIBuilder<HostDevice, LocalHostDeviceImplementation, DPort, DInterface> {

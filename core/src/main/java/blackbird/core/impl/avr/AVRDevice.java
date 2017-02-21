@@ -156,8 +156,7 @@ public class AVRDevice extends SerialDevice {
             @Override
             public Implementation build(AVRDevice device, Class<Implementation> interfaceType, Port port) {
 
-                SerialDevice.Implementation serialImplementation = blackbird.implementDevice(
-                        device, SerialDevice.Implementation.class);
+                SerialDevice.Implementation serialImplementation = device.getImplementation(SerialDevice.Implementation.class);
 
                 try {
 

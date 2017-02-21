@@ -1,6 +1,5 @@
 package blackbird.core.impl;
 
-import blackbird.core.Blackbird;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
@@ -28,23 +27,23 @@ public abstract class Socket extends Device {
     }
 
     public static int getToggleState(Socket socket) {
-        return Blackbird.getInstance().interfaceDevice(socket, Interface.class).getToggleState();
+        return socket.getInterface(Interface.class).getToggleState();
     }
 
     public static void setToggleState(Socket socket, int toggleState) {
-        Blackbird.getInstance().interfaceDevice(socket, Interface.class).setToggleState(toggleState);
+        socket.getInterface(Interface.class).setToggleState(toggleState);
     }
 
     public static void toggle(Socket socket) {
-        Blackbird.getInstance().interfaceDevice(socket, Interface.class).toggle();
+        socket.getInterface(Interface.class).toggle();
     }
 
     public static void turnOff(Socket socket) {
-        Blackbird.getInstance().interfaceDevice(socket, Interface.class).turnOff();
+        socket.getInterface(Interface.class).turnOff();
     }
 
     public static void turnOn(Socket socket) {
-        Blackbird.getInstance().interfaceDevice(socket, Interface.class).turnOn();
+        socket.getInterface(Interface.class).turnOn();
 
     }
 

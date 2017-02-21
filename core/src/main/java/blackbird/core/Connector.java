@@ -14,8 +14,6 @@ import blackbird.core.exception.NoConnectionException;
  */
 public interface Connector {
 
-    Blackbird blackbird = Blackbird.getInstance();
-
     /**
      * The general contract for <code>connectTo</code> is to return a fresh connection
      * with no communication done including no handshake and no remote side device check

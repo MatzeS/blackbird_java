@@ -14,7 +14,6 @@ import blackbird.core.impl.avr.DS18B20;
 import blackbird.core.impl.avr.InfraredReceiverImplementation;
 import blackbird.core.impl.avr.RCReceiver;
 import blackbird.core.impl.avr.RCSocketImplementation;
-import blackbird.core.ports.LocalHostDevicePort;
 
 /**
  * Register all DIBuilders to this registry so they can be used by blackbird.
@@ -29,8 +28,6 @@ public class DIBuilderRegistry {
     private DIBuilderRegistry() {
         builderList = new ArrayList<>();
 
-        builderList.add(new DImplementation.Builder());
-        builderList.add(new LocalHostDevicePort.Builder());
         builderList.add(new InfraredReceiverImplementation.Builder());
         builderList.add(new RCReceiver.Implementation.Builder());
         builderList.add(new AppleRemote.Implementation.Builder());

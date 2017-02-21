@@ -13,7 +13,7 @@ import blackbird.core.util.Generics;
  * <p>
  * This is typically used for a device attached to another and communicating through the parent.
  */
-public class ParentDevicePort extends DPort {
+public final class ParentDevicePort extends DPort {
 
     private static final long serialVersionUID = 5759808796154790653L;
     private Device parentDevice;
@@ -26,7 +26,18 @@ public class ParentDevicePort extends DPort {
         return parentDevice;
     }
 
-    public abstract static class Builder<D, I extends DInterface, P, PI>
+    public HostDevice getHost() {
+        Device parent = parentDevice;
+        while (true)
+            if (parent instanceof HostDevice)
+                return (HostDevice) parent;
+            else if (parent.getPort() instanceof ParentDevicePort)
+                parent = ((ParentDevicePort) parent.getPort()).getParentDevice();
+            else
+                throw new RuntimeException("parent device chain does not end on host device");
+    }
+
+    public abstract static class Builder<D extends Device, I extends DInterface, P, PI>
             extends GenericDIBuilder<D, I, ParentDevicePort> {
 
         private Class<P> parentDeviceType;
@@ -44,25 +55,18 @@ public class ParentDevicePort extends DPort {
 
         @Override
         public I build(D device, Class<I> interfaceType, ParentDevicePort port) {
+            HostDevice host = port.getHost();
+
+            if (!host.isHere())
+                return host.getInterface(HostDevice.Interface.class).interfaceDevice(device, interfaceType);
+
             Device parent = port.getParentDevice();
+            PI parentInterface = (PI) parent.getImplementation((Class<DInterface>) parentInterfaceType);
 
-            DInterface parentDInterface = blackbird.interfaceDevice(parent, DInterface.class);
+            // the null port here is crucial to the default DImplementationBuilder, which does not accept ParentDevicePorts
+            DInterface component = device.buildImplementation(DInterface.class, null);
 
-            HostDevice parentInterfaceHost = parentDInterface.getHost();
-
-            if (parentInterfaceHost.equals(blackbird.getLocalDevice())) {
-
-                // the null port here is crucial to the default DImplementationBuilder, which does not accept ParentDevicePorts
-                DInterface component = blackbird.buildDeviceImplementation((Device) device, DInterface.class, null);
-
-                PI parentInterface = (PI) blackbird.implementDevice(parent, (Class<DInterface>) parentInterfaceType);
-                return assemble(component, parentInterface);
-
-            } else {
-                return blackbird
-                        .interfaceDevice(parentInterfaceHost, HostDevice.Interface.class)
-                        .interfaceDevice((Device) device, interfaceType);
-            }
+            return assemble(component, parentInterface);
         }
 
         @Override

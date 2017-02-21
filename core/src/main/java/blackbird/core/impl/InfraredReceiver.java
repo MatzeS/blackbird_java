@@ -3,7 +3,6 @@ package blackbird.core.impl;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import blackbird.core.Blackbird;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
@@ -23,7 +22,7 @@ public class InfraredReceiver extends Device {
     public static Runnable map(InfraredReceiver infraredReceiver,
                                Predicate<Integer> codeFilter,
                                Consumer<Integer> action) {
-        Interface impl = Blackbird.getInstance().interfaceDevice(infraredReceiver, Interface.class);
+        Interface impl = infraredReceiver.getInterface(Interface.class);
         Listener listener = code -> {
             if (codeFilter.test(code))
                 action.accept(code);

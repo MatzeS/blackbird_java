@@ -3,7 +3,6 @@ package blackbird.core.impl;
 import java.io.IOException;
 import java.io.Serializable;
 
-import blackbird.core.Blackbird;
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.avr.ByteHelper;
@@ -26,7 +25,7 @@ public class MPR121 extends I2CSlave {
     }
 
     public static Runnable map(MPR121 mpr, int electrode, Transition transition, Runnable action) {
-        MPR121.Interface mprInterface = Blackbird.getInstance().interfaceDevice(mpr, MPR121.Interface.class);
+        MPR121.Interface mprInterface = mpr.getInterface(MPR121.Interface.class);
         Listener listener = event -> {
             if (transition.matches(event.getTransition()) && electrode == event.getElectrode())
                 action.run();
@@ -388,8 +387,7 @@ public class MPR121 extends I2CSlave {
             @Override
             public Implementation build(MPR121 device, ParentDevicePort port, I2CSlave.Interface componentInterface) {
                 try {
-                    I2CMaster.Interface i2cMasterInterface = blackbird.interfaceDevice(
-                            port.getParentDevice(), I2CMaster.Interface.class);
+                    I2CMaster.Interface i2cMasterInterface = port.getParentDevice().getInterface(I2CMaster.Interface.class);
                     return new Implementation(componentInterface, i2cMasterInterface);
                 } catch (IOException e) {
                     throw new ImplementationFailedException("I2C slave does not answer or not behaves as expected", e);

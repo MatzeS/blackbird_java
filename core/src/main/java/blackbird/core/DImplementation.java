@@ -1,9 +1,5 @@
 package blackbird.core;
 
-import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.ports.LocalHostDevicePort;
-import blackbird.core.ports.ParentDevicePort;
-
 /**
  * The basic implementation for a {@link Device}.
  * <p>
@@ -47,34 +43,6 @@ public class DImplementation implements DInterface {
     @Override
     public String toString() {
         return getClass().getName() + "[" + getDevice() + "]";
-    }
-
-    /**
-     * Local DIBuilder, can create a {@link DImplementation} for any device without dependencies.
-     */
-    public static class Builder extends GenericDIBuilder<Device, DInterface, DPort> {
-
-        public Builder() {
-            setPortType(null);
-        }
-
-        @Override
-        public DInterface build(Device device, Class<DInterface> interfaceType, DPort port) {
-            return new DImplementation(device, blackbird.getLocalDevice());
-        }
-
-        @Override
-        public void checkPort(DPort port) throws ImplementationFailedException {
-            if (port == null)
-                return;
-
-            // this allows ParentDevice- and LocalHostDevicePorts to be first resolved by their own builders
-            // TODO might refactor this into an interface or flag, every build should be able to prevent this build
-            if (port.getClass().equals(ParentDevicePort.class) || port.getClass().equals(LocalHostDevicePort.class))
-                throw new ImplementationFailedException("invalid port");
-
-        }
-
     }
 
 }

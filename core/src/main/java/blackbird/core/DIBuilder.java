@@ -15,8 +15,6 @@ import blackbird.core.exception.ImplementationFailedException;
  */
 public abstract class DIBuilder {
 
-    protected Blackbird blackbird = Blackbird.getInstance();
-
     private boolean recursiveInterfaceChecking = true;
     private boolean recursivePortChecking = true;
 
@@ -34,7 +32,6 @@ public abstract class DIBuilder {
      * @param port          the port to be used
      * @return the build DInterface
      * @throws ImplementationFailedException in case the build fails
-     * @see Blackbird#implementDevice(Device, Class)
      */
     public abstract DInterface buildImplementation(Device device, Class<?> interfaceType, DPort port);
 

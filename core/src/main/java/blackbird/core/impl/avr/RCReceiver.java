@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.function.Predicate;
 
-import blackbird.core.Blackbird;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
@@ -35,7 +34,7 @@ public class RCReceiver extends Device {
     public static Listener map(RCReceiver rcReceiver,
                                Predicate<Code> test,
                                Runnable task) {
-        return map(Blackbird.getInstance().interfaceDevice(rcReceiver, Interface.class), test, task);
+        return map(rcReceiver.getInterface(Interface.class), test, task);
     }
 
     public static Listener map(RCReceiver.Interface rcReceiverInterface,

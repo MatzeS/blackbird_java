@@ -31,7 +31,7 @@ public class HostDeviceImplementationBuilder extends GenericDIBuilder<HostDevice
 
     public HostDeviceImplementationBuilder() {
 
-        rmi = new RemoteMethodInvocation(Blackbird.class);
+        rmi = new RemoteMethodInvocation("blackbird");
 
         connectors = new ArrayList<>();
 

@@ -1,10 +1,11 @@
 package blackbird.core.impl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import blackbird.core.Blackbird;
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
@@ -46,7 +47,7 @@ public class AppleRemote extends Device {
     }
 
     public static Runnable map(AppleRemote remote, Predicate<Code> code, Runnable action) {
-        Interface impl = Blackbird.getInstance().interfaceDevice(remote, Interface.class);
+        Interface impl = remote.getInterface(Interface.class);
         Listener listener = new KeyMapper(code, action);
         impl.addListener(listener);
         return () -> impl.removeListener(listener);
@@ -140,24 +141,23 @@ public class AppleRemote extends Device {
         }
 
         public static class Builder extends
-                ComponentDIBuilder<AppleRemote, Interface, DPort, DInterface> {
+                ComponentDIBuilder<AppleRemote, Interface, Port, DInterface> {
 
             public Builder() {
                 setPortType(null);
             }
 
             @Override
-            public Interface build(AppleRemote device, DPort port,
+            public Interface build(AppleRemote device, Port port,
                                    DInterface componentInterface) {
                 Implementation impl = new Implementation(componentInterface);
-                blackbird.getDevices().stream()
-                        .filter(d -> d instanceof InfraredReceiver)
-                        .map(d -> (InfraredReceiver) d)
-                        .forEach(d ->
-                                InfraredReceiver.map(d,
-                                        code -> new Code(code).is(device.getRemoteID()),
-                                        code -> impl.listeners.fire(l -> l.codeReceived(new Code(code)))
-                                ));
+
+                port.getReceivers().forEach(d ->
+                        InfraredReceiver.map(d,
+                                code -> new Code(code).is(device.getRemoteID()),
+                                code -> impl.listeners.fire(l -> l.codeReceived(new Code(code)))
+                        ));
+
                 return impl;
             }
 
@@ -187,6 +187,27 @@ public class AppleRemote extends Device {
         @Override
         public void irReceive(int code) {
         }
+
+    }
+
+    public static class Port extends DPort {
+
+        private List<InfraredReceiver> receivers;
+
+        public Port(InfraredReceiver... receivers) {
+            this.receivers = new ArrayList<>();
+            for (InfraredReceiver r : receivers)
+                this.receivers.add(r);
+        }
+
+        public Port(List<InfraredReceiver> receivers) {
+            this.receivers = receivers;
+        }
+
+        public List<InfraredReceiver> getReceivers() {
+            return receivers;
+        }
+
     }
 
 }

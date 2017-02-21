@@ -10,7 +10,7 @@ import blackbird.core.util.Generics;
  * @param <P>  the consumed port
  * @param <CI> the inserted component implementation
  */
-public abstract class ComponentDIBuilder<D, I, P, CI extends DInterface> extends GenericDIBuilder<D, I, P> {
+public abstract class ComponentDIBuilder<D extends Device, I, P, CI extends DInterface> extends GenericDIBuilder<D, I, P> {
 
     private Class<CI> componentDeviceInterface;
 
@@ -20,7 +20,7 @@ public abstract class ComponentDIBuilder<D, I, P, CI extends DInterface> extends
 
     @Override
     public I build(D device, Class<I> interfaceType, P port) {
-        CI componentInterface = blackbird.implementDevice((Device) device, componentDeviceInterface);
+        CI componentInterface = device.getImplementation(componentDeviceInterface);
         //noinspection RedundantCast
         return (I) build(device, port, componentInterface);
     }

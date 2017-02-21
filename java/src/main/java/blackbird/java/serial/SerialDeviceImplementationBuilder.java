@@ -16,6 +16,9 @@ public class SerialDeviceImplementationBuilder
 
     @Override
     public SerialDevice.Implementation build(SerialDevice device, SerialDevice.Port port, DInterface componentInterface) {
+        if(!blackbird.getLocalDevice().equals(port.getHost()))
+            throw new ImplementationFailedException("serail device is not attached to this device");
+
         try {
             SerialConnection serialConnection = new SerialConnection(getSerialPort(port.getPort(), port.getBaudRate()));
 
