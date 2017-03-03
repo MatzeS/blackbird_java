@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.ComponentImplementation;
-import blackbird.core.DPort;
 import blackbird.core.avr.DigitalPinValue;
 
 import static blackbird.core.avr.ByteHelper.setBit;

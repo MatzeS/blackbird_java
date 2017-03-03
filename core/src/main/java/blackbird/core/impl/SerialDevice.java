@@ -5,7 +5,6 @@ import java.io.IOException;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DIState;
 import blackbird.core.DInterface;
-import blackbird.core.DPort;
 import blackbird.core.Device;
 import blackbird.core.HostDevice;
 import blackbird.core.serial.SerialConnection;

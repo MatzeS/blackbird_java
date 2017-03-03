@@ -22,6 +22,11 @@ public class LocalHostDeviceImplementation
     }
 
     @Override
+    public boolean hasDeviceImplementation(Device device) {
+        return device.
+    }
+
+    @Override
     public <T> T interfaceDevice(Device device, Class<T> interfaceType) {
         return device.getInterface(interfaceType);
     }

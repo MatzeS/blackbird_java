@@ -2,7 +2,6 @@ package blackbird.core.impl.avr;
 
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.DInterface;
-import blackbird.core.DPort;
 import blackbird.core.PacketConnection;
 import blackbird.core.avr.packets.CommonInterruptPacket;
 import blackbird.core.events.PacketReceivedEvent;

@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.DInterface;
-import blackbird.core.DPort;
 import blackbird.core.Device;
 import blackbird.core.util.ListenerList;
 
