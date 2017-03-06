@@ -1,35 +1,35 @@
 package blackbird.core;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import dagger.Module;
+import dagger.Provides;
+
+import javax.inject.Singleton;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Blackbird {
-
-    private static Blackbird instance = new Blackbird();
 
     private Map<Device, DIFrame> frames;
 
     private List<Device> devices;
-    private List<Link> links;
+    private List<Compound> compounds;
 
-
-    public static Map<Device, DIFrame> getDIFrames() {
-        return instance.frames;
+     public Map<Device, DIFrame> getDIFrames() {
+        return frames;
     }
 
-    public static List<Device> getDevices() {
-        return instance.devices;
+    public List<Device> getDevices() {
+        return devices;
     }
 
-    public static List<Link> getLinks() {
-        return instance.links;
+    public List<Compound> getCompounds() {
+        return compounds;
     }
 
-    private Blackbird() {
+    public Blackbird() {
 
         devices = new ArrayList<>();
-        links = new ArrayList<>();
+        compounds = new ArrayList<>();
 
     }
 

@@ -56,6 +56,9 @@ public class HostDevice extends Device {
 
         <T> T interfaceDevice(Device device, Class<T> interfaceType);
 
+        boolean isDeviceImplemented(Device device);
+
+        <T> T implement(Device device, Class<T> implementationType);
     }
 
     public static abstract class Implementation

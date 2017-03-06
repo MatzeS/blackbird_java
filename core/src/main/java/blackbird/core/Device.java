@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 import blackbird.core.ImplementationGraph.Node;
 import blackbird.core.exception.ImplementationFailedException;
 
+import javax.inject.Inject;
+
 /**
  * A device can be any type of hardware represented in the blackbird system.
  * It does not necessarily has to be a single piece of hardware, <br>
@@ -30,6 +32,9 @@ import blackbird.core.exception.ImplementationFailedException;
 public abstract class Device implements Serializable {
 
     private static final long serialVersionUID = 7683600417241772350L;
+
+    @Inject
+    Blackbird blackbird;
 
     /**
      * The name is used as user reference for a device, it should, but not necessarily has to be unique.
@@ -50,7 +55,7 @@ public abstract class Device implements Serializable {
     private DIState state;
 
     public Device() {
-        Blackbird.getDevices().add(this);
+        blackbird.getDevices().add(this);
 
         uiData = new HashMap<>();
 
@@ -122,9 +127,12 @@ public abstract class Device implements Serializable {
     }
 
     private DIFrame getFrame() {
-        return Blackbird.getDIFrames().get(this);
+        return blackbird.getDIFrames().get(this);
     }
 
+
+    public <T> T implement(Class<T> implementationType) {
+        }
 
 
 }
