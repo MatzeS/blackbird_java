@@ -16,8 +16,8 @@ public class Bond {
 
 
     public Bond(Device from, Device to) {
-
         this.from = from;
         this.to = to;
     }
+
 }

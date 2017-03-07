@@ -13,9 +13,8 @@ import blackbird.core.util.Generics;
  *
  * @param <D> the accepted device
  * @param <I> the produced interface
- * @param <P> the accepted port
  */
-public abstract class GenericDIBuilder<D extends Device, I, P> extends DIBuilder {
+public abstract class GenericDIBuilder<D extends Device, I> extends DIBuilder {
 
     private Class<D> deviceType;
 
@@ -25,18 +24,15 @@ public abstract class GenericDIBuilder<D extends Device, I, P> extends DIBuilder
      */
     private Class<I> interfaceType;
 
-    private Class<P> portType;
-
     public GenericDIBuilder() {
         deviceType = (Class<D>) Generics.getGenericArgument(this, 0);
         interfaceType = (Class<I>) Generics.getGenericArgument(this, 1);
-        portType = (Class<P>) Generics.getGenericArgument(this, 2);
     }
 
-    public abstract I build(D device, Class<I> interfaceType, P port);
+    public abstract I build(D device, Class<I> interfaceType);
 
     @Override
-    public DInterface buildImplementation(Device device, Class<?> interfaceType, DPort port) {
+    public DInterface buildImplementation(Device device, Class<?> interfaceType) {
 
         if (this.interfaceType != null && !interfaceType.isAssignableFrom(this.interfaceType))
             throw new ImplementationFailedException(
@@ -46,15 +42,9 @@ public abstract class GenericDIBuilder<D extends Device, I, P> extends DIBuilder
             throw new ImplementationFailedException(
                     new IllegalArgumentException(this.getClass() + " expects a " + deviceType));
 
-        if (this.portType != null)
-            if (port == null || !portType.isAssignableFrom(port.getClass()))
-                throw new ImplementationFailedException(
-                        new IllegalArgumentException(this.getClass() + " builder expects a " + portType));
-
         checkDevice((D) device);
-        checkPort((P) port);
 
-        return (DInterface) build((D) device, (Class<I>) interfaceType, (P) port);
+        return (DInterface) build((D) device, (Class<I>) interfaceType);
     }
 
     /**
@@ -66,17 +56,6 @@ public abstract class GenericDIBuilder<D extends Device, I, P> extends DIBuilder
      */
     public void checkDevice(D device) {
     }
-
-    /**
-     * Used to filter the port passed to the <code>buildImplementation</code> method.
-     * If the port is not suitable for the builder
-     * throw an {@link ImplementationFailedException} and indicate the reason.
-     *
-     * @param port the port to check
-     */
-    public void checkPort(P port) {
-    }
-
     public Class<D> getDeviceType() {
         return deviceType;
     }
@@ -91,14 +70,6 @@ public abstract class GenericDIBuilder<D extends Device, I, P> extends DIBuilder
 
     public void setInterfaceType(Class<I> interfaceType) {
         this.interfaceType = interfaceType;
-    }
-
-    public Class<P> getPortType() {
-        return portType;
-    }
-
-    public void setPortType(Class<P> portType) {
-        this.portType = portType;
     }
 
 }

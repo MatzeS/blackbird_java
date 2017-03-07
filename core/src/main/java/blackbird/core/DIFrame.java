@@ -77,6 +77,28 @@ public class DIFrame {
         return hostStream.findAny().orElseGet(null);
     }
 
+    public <T> T implement(Class<T> implementationType) {
+
+        // is implementation local -> return / build
+
+        // check remote -> take it
+
+        // build it on proper host
+
+    }
+
+
+    public <T> T buildImplementation(Class<T> implementationType) {
+
+        // build lock //TODO
+
+        // try builder
+
+        // add to graph
+
+
+    }
+
 
 }
 

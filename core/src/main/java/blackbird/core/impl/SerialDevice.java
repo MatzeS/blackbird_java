@@ -1,13 +1,9 @@
 package blackbird.core.impl;
 
-import java.io.IOException;
-
-import blackbird.core.ComponentImplementation;
-import blackbird.core.DIState;
-import blackbird.core.DInterface;
-import blackbird.core.Device;
-import blackbird.core.HostDevice;
+import blackbird.core.*;
 import blackbird.core.serial.SerialConnection;
+
+import java.io.IOException;
 
 public class SerialDevice extends Device {
 
@@ -51,34 +47,6 @@ public class SerialDevice extends Device {
 
         @Override
         public void loadState(DIState state) {
-        }
-
-    }
-
-    public static class Port extends DPort {
-
-        private static final long serialVersionUID = -9135816665280984514L;
-
-        private HostDevice host;
-        private String port;
-        private int baudRate;
-
-        public Port(HostDevice host, String port, int baudRate) {
-            this.host = host;
-            this.port = port;
-            this.baudRate = baudRate;
-        }
-
-        public int getBaudRate() {
-            return baudRate;
-        }
-
-        public HostDevice getHost() {
-            return host;
-        }
-
-        public String getPort() {
-            return port;
         }
 
     }
