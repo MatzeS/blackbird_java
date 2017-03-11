@@ -89,6 +89,16 @@ int main(void) {
 
     sei();
 
+    DDRB |= _BV(PB5);
+
+    PORTB |= _BV(PB5);
+    delay(200);
+    PORTB &= ~_BV(PB5);
+    delay(200);
+    PORTB |= _BV(PB5);
+    delay(200);
+    PORTB &= ~_BV(PB5);
+
     //TODO cleanup
 
     unsigned int incomingByte;

@@ -22,22 +22,16 @@ public class SerialDeviceImplementationBuilder
         try {
             SerialConnection serialConnection = new SerialConnection(getSerialPort(port.getPort(), port.getBaudRate()));
 
+            Thread.sleep(2000);
             return new SerialDevice.Implementation(componentInterface, serialConnection);
         } catch (IOException e) {
             throw new ImplementationFailedException("error todo, ioException", e);
+        } catch (InterruptedException e) {
+            throw new ImplementationFailedException("interrupted");
         }
     }
 
-    private static Connection connect(SerialDevice.Port devicePort) throws NoConnectionException {
-        try {
-            SerialPort serialPort = getSerialPort(devicePort.getPort(), devicePort.getBaudRate());
-            return new SerialConnection(serialPort);
-        } catch (IOException e) {
-            throw new NoConnectionException("could not establish serial port", e);
-        }
-    }
-
-    private static SerialPort getSerialPort(String portIdentifier, int baudRate) throws IOException {
+        private static SerialPort getSerialPort(String portIdentifier, int baudRate) throws IOException {
         //RXTXSerialPort port = new RXTXSerialPort();
         PJCSerialPort port = new PJCSerialPort();
         port.connect(portIdentifier, baudRate, 2000);

@@ -1,15 +1,19 @@
 package blackbird.core.impl;
 
-import java.io.IOException;
-import java.io.Serializable;
-
+import blackbird.core.Blackbird;
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.ComponentImplementation;
 import blackbird.core.avr.ByteHelper;
 import blackbird.core.exception.ImplementationFailedException;
+import blackbird.core.interconnect.Trigger;
 import blackbird.core.ports.ParentDevicePort;
 import blackbird.core.rmi.Remote;
 import blackbird.core.util.ListenerList;
+
+import java.io.IOException;
+import java.io.Serializable;
+
+import static blackbird.core.impl.MPR121.Register.*;
 
 public class MPR121 extends I2CSlave {
 
@@ -22,6 +26,21 @@ public class MPR121 extends I2CSlave {
 
     public MPR121(String name, int i2cAddress) {
         super(name, i2cAddress);
+    }
+
+    public Trigger getTrigger(int electrode, Transition transition){
+        return getTrigger(this, electrode, transition);
+    }
+
+    public static Trigger getTrigger(MPR121 mpr, int electrode, Transition transition){
+        MPR121.Interface mprInterface = Blackbird.getInstance().interfaceDevice(mpr, MPR121.Interface.class);
+        Trigger trigger = new Trigger();
+        Listener listener = event -> {
+            if (transition.matches(event.getTransition()) && electrode == event.getElectrode())
+                trigger.fire();
+        };
+        mprInterface.addListener(listener);
+        return trigger;
     }
 
     public static Runnable map(MPR121 mpr, int electrode, Transition transition, Runnable action) {
@@ -293,36 +312,57 @@ public class MPR121 extends I2CSlave {
 
         private void loadDefaultConfiguration() throws IOException {
 
-            // perform a soft reset
-            writeRegister(Register.SRST, 0x63);
+            //Reset MPR121 if not reset correctly
+            writeRegister(0x80,0x63);  //Soft reset
+            writeRegister(0x5E,0x00);  //Stop mode
 
-            writeRegister(Register.ECR, 0x00);
+            //touch pad baseline filter
+            //rising
+            writeRegister(0x2B,0x01); // MAX HALF DELTA Rising
+            writeRegister(0x2C,0x01); // NOISE HALF DELTA Rising
+            writeRegister(0x2D,0x0E); // NOISE COUNT LIMIT Rising
+            writeRegister(0x2E,0x00); // DELAY LIMIT Rising
+            //falling
+            writeRegister(0x2F,0x01); // MAX HALF DELTA Falling
+            writeRegister(0x30,0x05); // NOISE HALF DELTA Falling
+            writeRegister(0x31,0x01); // NOISE COUNT LIMIT Falling
+            writeRegister(0x32,0x00); // DELAY LIMIT Falling
+            //touched
+            writeRegister(0x33,0x00); // Noise half delta touched
+            writeRegister(0x34,0x00); // Noise counts touched
+            writeRegister(0x35,0x00); // Filter delay touched
 
-            int touch = 12;
+
+            //Touch pad threshold
+            int touch = 10;
             int release = 6;
             for (int i = 0; i < 12; i++) {
                 writeRegister(Register.E0TTH.add(2 * i), touch);
                 writeRegister(Register.E0RTH.add(2 * i), release);
             }
-            writeRegister(Register.MHDR, 0x01);
-            writeRegister(Register.NHDR, 0x01);
-            writeRegister(Register.NCLR, 0x0E);
-            writeRegister(Register.FDLR, 0x00);
 
-            writeRegister(Register.MHDF, 0x01);
-            writeRegister(Register.NHDF, 0x05);
-            writeRegister(Register.NCLF, 0x01);
-            writeRegister(Register.FDLF, 0x00);
 
-            writeRegister(Register.NHDT, 0x00);
-            writeRegister(Register.NCLT, 0x00);
-            writeRegister(Register.FDLT, 0x00);
+            //touch /release debounce
+            writeRegister(0x5B,0x00);
 
-            writeRegister(Register.DTR, 0x00);
-            writeRegister(Register.AFE1, 0x10); // default, 16uA charge current
-            writeRegister(Register.AFE2, 0x20); // 0.5uS encoding, 1ms period
+            // response time = SFI(10) X ESI(8ms) = 80ms
+            writeRegister(0x5D,0x13);
 
-            writeRegister(Register.ECR, 0x8F);  // start with first 5 bits of baseline tracking
+            //FFI=18
+            writeRegister(0x5C,0x80);
+
+
+            //Auto configuration
+            writeRegister(0x7B,0x8F);
+
+            // charge to 70% of Vdd , high sensitivity
+            writeRegister(0x7D,0xE4);
+            writeRegister(0x7E,0x94);
+            writeRegister(0x7F,0xCD);
+
+
+            // 12 electrodes enabled
+            writeRegister(0x5E,0xCC);
 
         }
 
@@ -346,7 +386,7 @@ public class MPR121 extends I2CSlave {
 
         private synchronized void updateTouchStates() {
             try {
-                int states = (readRegister(Register.TS2) << 8) + readRegister(Register.TS1);
+                int states = (readRegister(Register.TS2) << 8) + (readRegister(Register.TS1) & 0xFF);
 
                 int change = touchStates ^ states;
                 touchStates = states;
@@ -366,6 +406,10 @@ public class MPR121 extends I2CSlave {
 
         private void writeRegister(byte register, int value) throws IOException {
             writeRegister(register, (byte) value);
+        }
+
+        private void writeRegister(int register, int value) throws IOException {
+            writeRegister((byte) register, (byte) value);
         }
 
         @Override
@@ -393,6 +437,7 @@ public class MPR121 extends I2CSlave {
                     throw new ImplementationFailedException("I2C slave does not answer or not behaves as expected", e);
                 }
             }
+
         }
 
     }
