@@ -43,6 +43,4 @@ public class SerialBond extends Bond {
         return port;
     }
 
-
-
 }

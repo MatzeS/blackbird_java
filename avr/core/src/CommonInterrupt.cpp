@@ -28,12 +28,10 @@ void CommonInterrupt::Handler::loop() {
     }
 }
 
-ISR(PCINT2_vect) {
-
+void CommonInterrupt::Handler::trigger() {
     cli();
     commonInterruptPacketDispatch++;
     sei();
-
 }
 
 CommonInterrupt::Packet::Packet() {

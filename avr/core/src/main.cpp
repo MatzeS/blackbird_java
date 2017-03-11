@@ -17,13 +17,49 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmissing-noreturn"
 
+CommonInterrupt::Handler commonInterruptHandler;
+
+uint8_t activateCounter;
+uint16_t activateTimer;
+
+#define _abs(x)  (x<0)?-x:x
+#define AROUND(A, B, PADDING) (_abs((int32_t) A - (int32_t)B)) <= PADDING
+
+ISR(PCINT2_vect) {
+
+    commonInterruptHandler.trigger();
+
+
+    uint16_t time = (uint16_t) millis();
+    if(AROUND(time - activateTimer, 50, 5)){
+        activateCounter++;
+    }else
+        activateCounter = 0;
+
+    activateTimer = time;
+
+
+
+}
 
 int main(void) {
+
+    activateCounter = 0;
+    activateTimer = -1;
+
+    cli();
+    DDRD |= (1 << PD4);
+    PORTD |= (1 << PD4);
+    PCMSK2 |= (1 << PCINT20);
+    PCICR |= (1 << PCIE2);
+    sei();
+
+    while(activateCounter < 4);
+
 
     DeviceIdentification::Handler deviceIdentificationHandler;
     Blackbird.attachHandler(CMB_DEVICE_IDENTIFICATION, &deviceIdentificationHandler);
 
-    CommonInterrupt::Handler commonInterruptHandler;
     Blackbird.attachHandler(CMB_COMMON_INTERRUPT, &commonInterruptHandler);
 
     I2C::Handler i2cHandler;

@@ -14,6 +14,8 @@ namespace CommonInterrupt {
 
         virtual void loop() override;
 
+        virtual void trigger();
+
     };
 
     class Packet : public AbstractPacket {
