@@ -19,7 +19,7 @@
 
 CommonInterrupt::Handler commonInterruptHandler;
 
-uint8_t activateCounter;
+volatile uint8_t activateCounter;
 uint16_t activateTimer;
 
 #define _abs(x)  (x<0)?-x:x
@@ -27,11 +27,11 @@ uint16_t activateTimer;
 
 ISR(PCINT2_vect) {
 
-    commonInterruptHandler.trigger();
+    //commonInterruptHandler.trigger();
 
 
     uint16_t time = (uint16_t) millis();
-    if(AROUND(time - activateTimer, 50, 5)){
+    if(time - activateTimer < 60){
         activateCounter++;
     }else
         activateCounter = 0;
@@ -47,6 +47,10 @@ int main(void) {
     activateCounter = 0;
     activateTimer = -1;
 
+    // uses timer0
+    initSystemClock();
+
+
     cli();
     DDRD |= (1 << PD4);
     PORTD |= (1 << PD4);
@@ -56,6 +60,15 @@ int main(void) {
 
     while(activateCounter < 4);
 
+    DDRB |= _BV(PB5);
+
+    PORTB |= _BV(PB5);
+    delay(200);
+    PORTB &= ~_BV(PB5);
+    delay(200);
+    PORTB |= _BV(PB5);
+    delay(200);
+    PORTB &= ~_BV(PB5);
 
     DeviceIdentification::Handler deviceIdentificationHandler;
     Blackbird.attachHandler(CMB_DEVICE_IDENTIFICATION, &deviceIdentificationHandler);
@@ -83,21 +96,8 @@ int main(void) {
     uart_init(UART_BAUD_SELECT(BAUD_RATE, F_CPU));
     Blackbird.setTransmitFunc((transmitFunc) &uart_putc);
 
-    // uses timer0
-    initSystemClock();
 
 
-    sei();
-
-    DDRB |= _BV(PB5);
-
-    PORTB |= _BV(PB5);
-    delay(200);
-    PORTB &= ~_BV(PB5);
-    delay(200);
-    PORTB |= _BV(PB5);
-    delay(200);
-    PORTB &= ~_BV(PB5);
 
     //TODO cleanup
 
