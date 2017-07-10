@@ -1,0 +1,43 @@
+
+a device might be implemented from one of its access points
+
+those are super or sub modules or via some port -> domain -> access point device
+
+
+a device implemention builder might consume an access point
+to create the implementation
+
+for example
+
+mcp from i2cslave sub module
+i2cmaster from avr super device
+avr from serialmodule submodule
+serialmodule from serialmodule via domain
+serialmodule from host as submodule
+
+i2cslave from i2cmaster via domain
+host from host via domain
+
+
+
+builder.usesSuperModule
+builder.usesSubmodule
+builder.users Port
+builder.produces InterfaceType
+
+
+builder registered and has blackbird
+
+build device interfacetype
+
+    -> get my stuff and implement
+
+
+port consumer
+
+topologie
+
+a device has subdevices/modules
+a device might have a superdevice
+a device has ports
+a port generally belongs to a domain

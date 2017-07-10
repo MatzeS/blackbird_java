@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import blackbird.core.Connection;
+import blackbird.core.connection.Connection;
 
 /**
  * Connection implementation for communication via network sockets.

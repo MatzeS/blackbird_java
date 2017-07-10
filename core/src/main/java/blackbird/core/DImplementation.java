@@ -16,19 +16,17 @@ public class DImplementation implements DInterface {
     private Device device;
     private HostDevice host;
 
-    public DImplementation(Device device, HostDevice host) {
+    public DImplementation() {
         super();
-        this.device = device;
-        this.host = host;
     }
 
     @Override
-    public DIState destroy() {
-        return null;
-    }
-
     public Device getDevice() {
         return device;
+    }
+
+    protected void setDevice(Device device) {
+        this.device = device;
     }
 
     @Override
@@ -36,8 +34,8 @@ public class DImplementation implements DInterface {
         return host;
     }
 
-    @Override
-    public void loadState(DIState state) {
+    protected void setHost(HostDevice host) {
+        this.host = host;
     }
 
     @Override

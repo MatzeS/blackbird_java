@@ -1,6 +1,6 @@
 package blackbird.core;
 
-import blackbird.core.exception.NoConnectionException;
+import blackbird.core.connection.exceptions.NoConnectionException;
 import blackbird.core.util.Generics;
 
 /**

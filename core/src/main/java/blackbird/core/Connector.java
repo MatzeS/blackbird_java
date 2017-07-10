@@ -1,6 +1,7 @@
 package blackbird.core;
 
-import blackbird.core.exception.NoConnectionException;
+import blackbird.core.builders.DIBuilder;
+import blackbird.core.connection.exceptions.NoConnectionException;
 
 /**
  * Deriving objects are used by the {@link HostDeviceImplementationBuilder}

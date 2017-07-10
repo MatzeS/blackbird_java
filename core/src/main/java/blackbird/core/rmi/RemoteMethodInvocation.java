@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import blackbird.core.HostConnection;
-import blackbird.core.events.CloseEvent;
-import blackbird.core.events.PacketReceivedEvent;
+import blackbird.core.connection.CloseEvent;
+import blackbird.core.connection.PacketReceivedEvent;
 import blackbird.core.rmi.packets.InvokeMethod;
 
 public class RemoteMethodInvocation {

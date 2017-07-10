@@ -3,17 +3,18 @@ package blackbird.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import blackbird.core.impl.AppleRemote;
-import blackbird.core.impl.AukeyRemote;
-import blackbird.core.impl.AukeySocket;
-import blackbird.core.impl.LightController;
-import blackbird.core.impl.MCP23017;
-import blackbird.core.impl.avr.AVRDevice;
-import blackbird.core.impl.avr.AVRI2CSlaveImplementation;
-import blackbird.core.impl.avr.DS18B20;
-import blackbird.core.impl.avr.InfraredReceiverImplementation;
-import blackbird.core.impl.avr.RCReceiver;
-import blackbird.core.impl.avr.RCSocketImplementation;
+import blackbird.core.builders.DIBuilder;
+import blackbird.core.device.AppleRemote;
+import blackbird.core.device.AukeyRemote;
+import blackbird.core.device.AukeySocket;
+import blackbird.core.device.LightController;
+import blackbird.core.device.MCP23017;
+import blackbird.core.device.avr.AVRDevice;
+import blackbird.core.device.avr.AVRI2CMasterModuleImplementation;
+import blackbird.core.device.avr.DS18B20;
+import blackbird.core.device.avr.InfraredReceiverImplementation;
+import blackbird.core.device.avr.RCReceiver;
+import blackbird.core.device.avr.RCSocketImplementation;
 
 /**
  * Register all DIBuilders to this registry so they can be used by blackbird.
@@ -37,13 +38,13 @@ public class DIBuilderRegistry {
         builderList.add(new RCSocketImplementation.Builder());
         builderList.add(new LightController.Implementation.Builder());
         builderList.add(new AVRDevice.Implementation.Builder());
-        builderList.add(new AVRI2CSlaveImplementation.Builder());
-        builderList.add(new blackbird.core.impl.avr.RCSocketImplementation.Builder());
-        builderList.add(new blackbird.core.impl.avr.RCReceiver.Implementation.Builder());
+        builderList.add(new AVRI2CMasterModuleImplementation.Builder());
+        builderList.add(new blackbird.core.device.avr.RCSocketImplementation.Builder());
+        builderList.add(new blackbird.core.device.avr.RCReceiver.Implementation.Builder());
         builderList.add(new DS18B20.Implementation.Builder());
-        builderList.add(new blackbird.core.impl.avr.InfraredReceiverImplementation.Builder());
-        builderList.add(new blackbird.core.impl.MPR121.Implementation.Builder());
-        builderList.add(new blackbird.core.impl.avr.AVRI2CMasterImplementation.Builder());
+        builderList.add(new blackbird.core.device.avr.InfraredReceiverImplementation.Builder());
+        builderList.add(new blackbird.core.device.MPR121.Implementation.Builder());
+        builderList.add(new blackbird.core.device.avr.AVRI2CMasterImplementation.Builder());
 
         builderList.add(new LocalHostDeviceImplementation.Builder());
     }

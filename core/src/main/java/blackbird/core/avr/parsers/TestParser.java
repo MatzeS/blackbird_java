@@ -1,6 +1,6 @@
 package blackbird.core.avr.parsers;
 
-import blackbird.core.Packet;
+import blackbird.core.connection.Packet;
 
 public class TestParser extends PacketParser {
 

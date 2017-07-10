@@ -1,9 +1,9 @@
 package blackbird.core.avr.parsers;
 
-import blackbird.core.Packet;
+import blackbird.core.connection.Packet;
 import blackbird.core.avr.CommandBytes;
 import blackbird.core.avr.packets.RCReceiveResponse;
-import blackbird.core.impl.avr.RCReceiver;
+import blackbird.core.device.avr.RCReceiver;
 
 import static blackbird.core.avr.ByteHelper.decode2Byte;
 import static blackbird.core.avr.ByteHelper.decode4Byte;

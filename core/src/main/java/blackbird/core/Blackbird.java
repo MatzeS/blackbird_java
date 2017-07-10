@@ -1,36 +1,12 @@
 package blackbird.core;
 
-import dagger.Module;
-import dagger.Provides;
+public interface Blackbird {
 
-import javax.inject.Singleton;
-import java.util.*;
-import java.util.stream.Collectors;
+    <T> T implementDevice(Device device, Class<T> type);
 
-public class Blackbird {
+    <T> T interfaceDevice(Device device, Class<T> type);
 
-    private Map<Device, DIFrame> frames;
 
-    private List<Device> devices;
-    private List<Compound> compounds;
-
-     public Map<Device, DIFrame> getDIFrames() {
-        return frames;
-    }
-
-    public List<Device> getDevices() {
-        return devices;
-    }
-
-    public List<Compound> getCompounds() {
-        return compounds;
-    }
-
-    public Blackbird() {
-
-        devices = new ArrayList<>();
-        compounds = new ArrayList<>();
-
-    }
+    boolean isLocallyImplemented(Device endpoint);
 
 }

@@ -9,9 +9,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.function.Predicate;
 
-import blackbird.core.Connection;
-import blackbird.core.Packet;
-import blackbird.core.PacketConnection;
+import blackbird.core.connection.Connection;
+import blackbird.core.connection.Packet;
+import blackbird.core.connection.PacketConnection;
 import blackbird.core.avr.DS18B20.DS18B20Parser;
 import blackbird.core.avr.i2c.I2CParser;
 import blackbird.core.avr.packets.TransmittableAVRPacket;

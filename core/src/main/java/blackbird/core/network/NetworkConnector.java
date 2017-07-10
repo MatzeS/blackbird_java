@@ -14,7 +14,7 @@ import java.util.List;
 import blackbird.core.GenericConnector;
 import blackbird.core.HostDevice;
 import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.exception.NoConnectionException;
+import blackbird.core.connection.exceptions.NoConnectionException;
 import blackbird.core.util.MultiException;
 
 /**

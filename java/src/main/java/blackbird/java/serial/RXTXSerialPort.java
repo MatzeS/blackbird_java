@@ -14,8 +14,8 @@ import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.TooManyListenersException;
 
-import blackbird.core.CloseReason;
-import blackbird.core.serial.AbstractSerialPort;
+import blackbird.core.connection.CloseReason;
+import blackbird.core.connection.serial.AbstractSerialPort;
 
 public class RXTXSerialPort extends AbstractSerialPort implements gnu.io.SerialPortEventListener {
 

@@ -1,0 +1,57 @@
+
+<device>
+    <name>ontario</name>
+    <modules>
+        <device>
+            <type>i2cmaster</type>
+        </device>
+        <i2cmaster>
+            <i2cmasterPort>
+
+            </i2cmasterPort>
+        </i2cmaster>
+    </modules>
+</device>
+
+<device>
+    <name>mcp</name>
+    <type>mpc23017</type>
+    <port>
+        <address>12309</address>
+        <busmaster>ontario</busmaster>
+    </port>
+</device>
+
+<device>
+    <name>mcp</name>
+    <type>mpc23017</type>
+    refering to the class type to be implemented as
+    if a device has no type, for it self its useless, since default is type is device
+    and device interface is empty
+    still for subunits it usefull
+
+    <i2cunit>
+        <name>mcp.i2cunit</name>
+        <address>12309</address>
+        <bus>x</bus>
+    </i2cunit>
+</device>
+
+<bus>
+    <name>x</name>
+    <master>ontario</master>
+    <slave>mcp</slave>
+    <slave>mcp.i2c</slave>
+</bus>
+
+<device>
+    <name></name>
+    <subdevice>
+        <device>
+            <type>i2cslave</type>
+            <address></address>
+            <bus></bus>
+            <busmaster>ontario</busmaster>
+        </device>
+    </subdevice>
+ </device>

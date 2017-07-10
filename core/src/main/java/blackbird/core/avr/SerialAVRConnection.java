@@ -2,9 +2,9 @@ package blackbird.core.avr;
 
 import java.io.IOException;
 
-import blackbird.core.CloseReason;
-import blackbird.core.serial.SerialConnection;
-import blackbird.core.serial.SerialPort;
+import blackbird.core.connection.CloseReason;
+import blackbird.core.connection.serial.SerialConnection;
+import blackbird.core.connection.serial.SerialPort;
 
 public class SerialAVRConnection extends AVRConnection implements SerialPort.Listener {
 

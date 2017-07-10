@@ -7,18 +7,20 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import blackbird.core.events.PacketReceivedEvent;
+import blackbird.core.HostDevice.Interface;
+import blackbird.core.builders.GenericDIBuilder;
+import blackbird.core.connection.PacketReceivedEvent;
 import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.exception.NoReplyException;
+import blackbird.core.connection.exceptions.NoReplyException;
 import blackbird.core.network.NetworkConnector;
-import blackbird.core.packets.HandshakePacket;
+import blackbird.core.network.packets.HandshakePacket;
 import blackbird.core.rmi.RemoteMethodInvocation;
 import blackbird.core.util.MultiException;
 
 /**
  * A builder providing interfaces of other host devices using {@link HostConnection}s.
  */
-public class HostDeviceImplementationBuilder extends GenericDIBuilder<HostDevice, HostDevice.Interface, DPort> {
+public class HostDeviceImplementationBuilder extends GenericDIBuilder<HostDevice, Interface, DPort> {
 
     public static final long DEFAULT_HANDSHAKE_TIMEOUT = 2000;
 

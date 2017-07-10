@@ -2,7 +2,7 @@ package blackbird.spring.impl;
 
 import blackbird.core.Blackbird;
 import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.impl.Socket;
+import blackbird.core.device.Socket;
 import blackbird.spring.DeviceController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 
 @RestController
 @RequestMapping("/device/remoteSocket/")

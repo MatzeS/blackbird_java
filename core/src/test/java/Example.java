@@ -1,5 +1,5 @@
-import blackbird.core.impl.MPR121;
-import blackbird.core.impl.avr.AVRDevice;
+import blackbird.core.device.MPR121;
+import blackbird.core.device.avr.AVRDevice;
 
 public class Example {
 

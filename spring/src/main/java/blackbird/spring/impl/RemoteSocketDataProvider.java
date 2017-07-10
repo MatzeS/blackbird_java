@@ -1,6 +1,6 @@
 package blackbird.spring.impl;
 
-import blackbird.core.impl.Socket;
+import blackbird.core.device.Socket;
 import blackbird.spring.DataProvider;
 
 import java.util.Map;

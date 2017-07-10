@@ -8,14 +8,13 @@ import blackbird.core.rmi.Remote;
  * The functions defined in this interface are mainly used internal (implementation con-/destruction).
  */
 public interface DInterface extends Remote {
-
     /**
      * Destroys the implementation, freeing IO resources and collecting
      * persistent information of the device in a DIState for later reconstruction (loadState).
      *
      * @return state for reconstruction, null by default.
      */
-    DIState destroy();
+//    DIState destroy();
 
     /**
      * The device accessed by this interface.
@@ -36,6 +35,6 @@ public interface DInterface extends Remote {
      *
      * @param state the previous state
      */
-    void loadState(DIState state);
+//    void loadState(DIState state);
 
 }

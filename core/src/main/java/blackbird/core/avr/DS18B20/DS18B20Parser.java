@@ -1,6 +1,6 @@
 package blackbird.core.avr.DS18B20;
 
-import blackbird.core.Packet;
+import blackbird.core.connection.Packet;
 import blackbird.core.avr.ByteHelper;
 import blackbird.core.avr.CommandBytes;
 import blackbird.core.avr.parsers.PacketParser;

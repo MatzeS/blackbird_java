@@ -1,6 +1,6 @@
 package blackbird.core.avr.packets;
 
-import blackbird.core.impl.avr.RCReceiver;
+import blackbird.core.device.avr.RCReceiver;
 
 public class RCReceiveResponse extends AVRPacket {
 
