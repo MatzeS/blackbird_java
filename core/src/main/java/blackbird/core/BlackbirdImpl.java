@@ -111,6 +111,10 @@ public class BlackbirdImpl implements Blackbird {
     private boolean isConstructable(Device device, Class<?> type) {
         //TODO might not work, spec on recursive builders like superimplB,
         // also where does the recursion terminate? on hosts? always, bounce?
+
+        if (getDeviceManager(device).map(DeviceManager::isLocallyImplemented).isPresent())
+            return false;
+
         return builders.stream()
                 .filter(builder -> builder.produces(type) && builder.canBuild(device))
                 .anyMatch(builder -> builder.getBuildRequirements(device).stream()
@@ -145,7 +149,7 @@ public class BlackbirdImpl implements Blackbird {
         private <T> T buildImplementation(Class<T> type) {
 
             for (DIBuilder builder : builders)
-                if (builder.canBuild(device) && builder.produces(type)) {
+                if (builder.canBuild(device) && builder.produces(type)) { //TODO not good, build should be predetermined
 
                     DImplementation impl = builder.build(device);
 
@@ -176,7 +180,7 @@ public class BlackbirdImpl implements Blackbird {
             return getAvailableHostDeviceInterfaces().entrySet().stream()
                     .filter(e -> e.getValue().isConstructable(device, type))
                     .findAny()
-                    .orElseThrow(()->new BFException("No available host can implement the device with requested type"))
+                    .orElseThrow(() -> new BFException("No available host can implement the device with requested type"))
                     .getValue().interfaceDevice(device, type);
 
         }
