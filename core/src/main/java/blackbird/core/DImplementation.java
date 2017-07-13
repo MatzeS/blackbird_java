@@ -13,8 +13,8 @@ package blackbird.core;
  */
 public class DImplementation implements DInterface {
 
-    private Device device;
-    private HostDevice host;
+    protected Device device;
+    protected HostDevice host;
 
     public DImplementation() {
         super();

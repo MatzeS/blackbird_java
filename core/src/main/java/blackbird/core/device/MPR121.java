@@ -1,17 +1,19 @@
 package blackbird.core.device;
 
-import blackbird.core.Blackbird;
-import blackbird.core.ComponentDIBuilder;
-import blackbird.core.ComponentImplementation;
-import blackbird.core.avr.ByteHelper;
-import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.interconnect.Trigger;
-import blackbird.core.ports.ParentDevicePort;
-import blackbird.core.rmi.Remote;
-import blackbird.core.util.ListenerList;
-
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+import blackbird.core.Blackbird;
+import blackbird.core.DImplementation;
+import blackbird.core.avr.ByteHelper;
+import blackbird.core.builders.GenericBuilder;
+import blackbird.core.exception.BFException;
+import blackbird.core.interconnect.Trigger;
+import blackbird.core.rmi.Remote;
+import blackbird.core.util.BuildRequirement;
+import blackbird.core.util.ListenerList;
 
 public class MPR121 extends I2CSlave {
 
@@ -22,16 +24,12 @@ public class MPR121 extends I2CSlave {
 
     public static final int PROXIMITY_ELECTRODE = 12;
 
-    public MPR121(String name, int i2cAddress) {
-        super(name, i2cAddress);
+    public Trigger getTrigger(Blackbird blackbird, int electrode, Transition transition) {
+        return getTrigger(blackbird, this, electrode, transition);
     }
 
-    public Trigger getTrigger(int electrode, Transition transition){
-        return getTrigger(this, electrode, transition);
-    }
-
-    public static Trigger getTrigger(MPR121 mpr, int electrode, Transition transition){
-        MPR121.Interface mprInterface = Blackbird.getInstance().interfaceDevice(mpr, MPR121.Interface.class);
+    public static Trigger getTrigger(Blackbird blackbird, MPR121 mpr, int electrode, Transition transition) {
+        MPR121.Interface mprInterface = blackbird.interfaceDevice(mpr, MPR121.Interface.class);
         Trigger trigger = new Trigger();
         Listener listener = event -> {
             if (transition.matches(event.getTransition()) && electrode == event.getElectrode())
@@ -41,8 +39,8 @@ public class MPR121 extends I2CSlave {
         return trigger;
     }
 
-    public static Runnable map(MPR121 mpr, int electrode, Transition transition, Runnable action) {
-        MPR121.Interface mprInterface = mpr.getInterface(MPR121.Interface.class);
+    public static Runnable map(Blackbird blackbird, MPR121 mpr, int electrode, Transition transition, Runnable action) {
+        MPR121.Interface mprInterface = blackbird.interfaceDevice(mpr, MPR121.Interface.class);
         Listener listener = event -> {
             if (transition.matches(event.getTransition()) && electrode == event.getElectrode())
                 action.run();
@@ -51,7 +49,7 @@ public class MPR121 extends I2CSlave {
         return () -> mprInterface.removeListener(listener);
     }
 
-    @SuppressWarnings("SpellCheckingInspection")
+    @SuppressWarnings({"SpellCheckingInspection", "unused"})
     public enum Register {
 
         // touch and OOR statuses
@@ -281,23 +279,45 @@ public class MPR121 extends I2CSlave {
 
     }
 
-    public static class Implementation extends ComponentImplementation<MPR121, I2CSlave.Interface>
+    public static class Builder extends GenericBuilder<MPR121, Implementation> {
+
+        @Override
+        public Implementation buildGeneric(MPR121 device) throws BFException {
+            I2CSlave.Interface slave = blackbird.implementDevice(device, I2CSlave.Interface.class);
+            I2CMaster.Interface master = blackbird.implementDevice(device, I2CMaster.Interface.class);
+            try {
+                return new Implementation(slave, master);
+            } catch (IOException e) {
+                throw new BFException("Failed to load default settings", e);
+            }
+        }
+
+        @Override
+        public List<BuildRequirement> getPossiblyUniqueRequirementsOf(MPR121 device) {
+            List<BuildRequirement> requirements = new ArrayList<>();
+            requirements.add(new BuildRequirement(device, I2CSlave.Interface.class));
+            requirements.add(new BuildRequirement(device.getMaster(), I2CMaster.Interface.class));
+            return requirements;
+        }
+
+    }
+
+    public static class Implementation extends DImplementation
             implements Interface {
 
+        private I2CSlave.Interface delegate;
         private ListenerList<Listener> listeners;
-
         private int touchStates = 0;
 
+        public Implementation(I2CSlave.Interface delegate, I2CMaster.Interface i2cMasterInterface) throws IOException {
+            this.delegate = delegate;
 
-        public Implementation(I2CSlave.Interface component, I2CMaster.Interface i2cMasterInterface) throws IOException {
-            super(component);
             this.listeners = new ListenerList<>();
 
             loadDefaultConfiguration();
 
             i2cMasterInterface.addListener(this::updateTouchStates);
         }
-
 
         @Override
         public void addListener(Listener listener) {
@@ -311,24 +331,24 @@ public class MPR121 extends I2CSlave {
         private void loadDefaultConfiguration() throws IOException {
 
             //Reset MPR121 if not reset correctly
-            writeRegister(0x80,0x63);  //Soft reset
-            writeRegister(0x5E,0x00);  //Stop mode
+            writeRegister(0x80, 0x63);  //Soft reset
+            writeRegister(0x5E, 0x00);  //Stop mode
 
             //touch pad baseline filter
             //rising
-            writeRegister(0x2B,0x01); // MAX HALF DELTA Rising
-            writeRegister(0x2C,0x01); // NOISE HALF DELTA Rising
-            writeRegister(0x2D,0x0E); // NOISE COUNT LIMIT Rising
-            writeRegister(0x2E,0x00); // DELAY LIMIT Rising
+            writeRegister(0x2B, 0x01); // MAX HALF DELTA Rising
+            writeRegister(0x2C, 0x01); // NOISE HALF DELTA Rising
+            writeRegister(0x2D, 0x0E); // NOISE COUNT LIMIT Rising
+            writeRegister(0x2E, 0x00); // DELAY LIMIT Rising
             //falling
-            writeRegister(0x2F,0x01); // MAX HALF DELTA Falling
-            writeRegister(0x30,0x05); // NOISE HALF DELTA Falling
-            writeRegister(0x31,0x01); // NOISE COUNT LIMIT Falling
-            writeRegister(0x32,0x00); // DELAY LIMIT Falling
+            writeRegister(0x2F, 0x01); // MAX HALF DELTA Falling
+            writeRegister(0x30, 0x05); // NOISE HALF DELTA Falling
+            writeRegister(0x31, 0x01); // NOISE COUNT LIMIT Falling
+            writeRegister(0x32, 0x00); // DELAY LIMIT Falling
             //touched
-            writeRegister(0x33,0x00); // Noise half delta touched
-            writeRegister(0x34,0x00); // Noise counts touched
-            writeRegister(0x35,0x00); // Filter delay touched
+            writeRegister(0x33, 0x00); // Noise half delta touched
+            writeRegister(0x34, 0x00); // Noise counts touched
+            writeRegister(0x35, 0x00); // Filter delay touched
 
 
             //Touch pad threshold
@@ -341,31 +361,32 @@ public class MPR121 extends I2CSlave {
 
 
             //touch /release debounce
-            writeRegister(0x5B,0x00);
+            writeRegister(0x5B, 0x00);
 
             // response time = SFI(10) X ESI(8ms) = 80ms
-            writeRegister(0x5D,0x13);
+            writeRegister(0x5D, 0x13);
 
             //FFI=18
-            writeRegister(0x5C,0x80);
+            writeRegister(0x5C, 0x80);
 
 
             //Auto configuration
-            writeRegister(0x7B,0x8F);
+            writeRegister(0x7B, 0x8F);
 
             // charge to 70% of Vdd , high sensitivity
-            writeRegister(0x7D,0xE4);
-            writeRegister(0x7E,0x94);
-            writeRegister(0x7F,0xCD);
+            writeRegister(0x7D, 0xE4);
+            writeRegister(0x7E, 0x94);
+            writeRegister(0x7F, 0xCD);
 
 
             // 12 electrodes enabled
-            writeRegister(0x5E,0xCC);
+            writeRegister(0x5E, 0xCC);
 
         }
 
+        @Override
         public byte readRegister(byte registerAddress) throws IOException {
-            return component.readRegister(registerAddress);
+            return delegate.readRegister(registerAddress);
         }
 
         @Override
@@ -373,8 +394,9 @@ public class MPR121 extends I2CSlave {
             return readRegister(register.get());
         }
 
+        @Override
         public byte[] readRegisters(byte registerAddress, int num) throws IOException {
-            return component.readRegisters(registerAddress, num);
+            return delegate.readRegisters(registerAddress, num);
         }
 
         @Override
@@ -398,6 +420,11 @@ public class MPR121 extends I2CSlave {
             }
         }
 
+        @Override
+        public void writeRegister(byte registerAddress, byte value) throws IOException {
+            delegate.writeRegister(registerAddress, value);
+        }
+
         private void writeRegister(Register register, int value) throws IOException {
             writeRegister(register, (byte) value);
         }
@@ -415,27 +442,9 @@ public class MPR121 extends I2CSlave {
             writeRegister(register.get(), value);
         }
 
-        public void writeRegister(byte registerAddress, byte value) throws IOException {
-            component.writeRegister(registerAddress, value);
-        }
-
+        @Override
         public void writeRegisters(byte registerAddress, byte[] data) throws IOException {
-            component.writeRegisters(registerAddress, data);
-        }
-
-        public static class Builder extends
-                ComponentDIBuilder<MPR121, Implementation, ParentDevicePort, I2CSlave.Interface> {
-
-            @Override
-            public Implementation build(MPR121 device, ParentDevicePort port, I2CSlave.Interface componentInterface) {
-                try {
-                    I2CMaster.Interface i2cMasterInterface = port.getParentDevice().getInterface(I2CMaster.Interface.class);
-                    return new Implementation(componentInterface, i2cMasterInterface);
-                } catch (IOException e) {
-                    throw new ImplementationFailedException("I2C slave does not answer or not behaves as expected", e);
-                }
-            }
-
+            delegate.writeRegisters(registerAddress, data);
         }
 
     }

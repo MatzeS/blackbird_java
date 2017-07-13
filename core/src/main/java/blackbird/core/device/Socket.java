@@ -1,7 +1,6 @@
 package blackbird.core.device;
 
 import blackbird.core.Blackbird;
-import blackbird.core.ComponentImplementation;
 import blackbird.core.DImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
@@ -118,7 +117,7 @@ public abstract class Socket extends Device {
      * Note: The deriving class still has to invoke the <code>fireStateChanged</code> method.
      */
     public static abstract class Implementation
-            extends DImplementation<Socket>
+            extends DImplementation
             implements Interface {
 
         private ListenerList<Listener> listeners;
@@ -134,6 +133,11 @@ public abstract class Socket extends Device {
 
         protected void fireStateChanged() {
             listeners.fire(l -> l.stateChanged(getDevice(), getToggleState()));
+        }
+
+        @Override
+        public Socket getDevice() {
+            return (Socket) device;
         }
 
         @Override

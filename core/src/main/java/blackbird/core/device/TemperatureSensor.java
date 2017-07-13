@@ -38,7 +38,7 @@ public class TemperatureSensor extends Device {
         ).activate();
     }
 
-    public interface Interface<D extends TemperatureSensor> extends DInterface {
+    public interface Interface extends DInterface {
 
         /**
          * @return the temperature in Celsius

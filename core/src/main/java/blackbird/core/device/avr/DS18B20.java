@@ -37,11 +37,11 @@ public class DS18B20 extends TemperatureSensor {
         setAddress(ByteHelper.decode8Byte(address));
     }
 
-    public interface Interface extends TemperatureSensor.Interface<DS18B20> {
+    public interface Interface extends TemperatureSensor.Interface {
 
     }
 
-    public static class Implementation extends DImplementation<DS18B20>
+    public static class Implementation extends DImplementation
             implements Interface {
 
         private AVRDevice.Implementation avr;
@@ -51,10 +51,15 @@ public class DS18B20 extends TemperatureSensor {
         }
 
         @Override
+        public DS18B20 getDevice(){
+            return (DS18B20) super.getDevice();
+        }
+
+        @Override
         public double getTemperature() {
             try {
                 return avr.getAVRConnection().sendAndReceive(
-                        new DS18B20ReadQuery(getDevice().address),
+                        new DS18B20ReadQuery(getDevice().getAddress()),
                         DS18B20ReadResponse.class,
                         r -> r.getAddress() == getDevice().address
                 ).getTemp();

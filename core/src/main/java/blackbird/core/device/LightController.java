@@ -4,17 +4,17 @@ import java.io.IOException;
 
 import blackbird.core.ComponentDIBuilder;
 import blackbird.core.ComponentImplementation;
+import blackbird.core.DImplementation;
 import blackbird.core.DInterface;
+import blackbird.core.Device;
+import blackbird.core.builders.ModuleDIBuilder;
 import blackbird.core.connection.serial.SerialConnection;
+import blackbird.core.device.SerialDevice.Implementation;
 import blackbird.core.util.Color;
 
 public class LightController extends SerialDevice {
 
     private static final long serialVersionUID = 7937368501061607511L;
-
-    public LightController(String name) {
-        super(name);
-    }
 
 
     public interface Interface extends DInterface {
@@ -27,13 +27,17 @@ public class LightController extends SerialDevice {
     }
 
     public static class Implementation
-            extends ComponentImplementation<LightController, SerialDevice.Implementation> implements Interface {
+            extends DImplementation implements Interface {
 
         private SerialConnection serialConnection;
 
-        public Implementation(SerialDevice.Implementation component) {
-            super(component);
-            this.serialConnection = component.getSerialConnection();
+        public Implementation(SerialDevice.Implementation module) {
+            this.serialConnection = module.getSerialConnection();
+        }
+
+        @Override
+        public LightController getDevice(){
+            return (LightController) super.getDevice();
         }
 
         @Override
@@ -54,11 +58,17 @@ public class LightController extends SerialDevice {
             }
         }
 
-        public static class Builder extends ComponentDIBuilder<LightController, Implementation, Port, SerialDevice.Implementation> {
+
+        public static class Builder extends ModuleDIBuilder<LightController, Implementation, SerialDevice, SerialDevice.Implementation> {
 
             @Override
-            public Implementation build(LightController device, Port port, SerialDevice.Implementation componentInterface) {
-                return new Implementation(componentInterface);
+            public Implementation buildFromModule(LightController device, SerialDevice module, SerialDevice.Implementation moduleImpl) {
+                return new Implementation(moduleImpl);
+            }
+
+            @Override
+            public Device getModule(LightController device) {
+                return device.getModule();//TODO
             }
         }
 

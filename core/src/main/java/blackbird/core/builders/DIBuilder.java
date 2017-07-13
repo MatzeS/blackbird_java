@@ -18,7 +18,7 @@ import blackbird.core.util.BuildRequirement;
  */
 public abstract class DIBuilder {
 
-    protected Blackbird blackbird;
+    protected Blackbird blackbird; //TODO extract to handle
 
     public abstract DImplementation build(Device device);
 

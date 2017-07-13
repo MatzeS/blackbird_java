@@ -24,6 +24,8 @@ public class HostDevice extends Device {
 
         <T> T interfaceDevice(Device device, Class<T> interfaceType);
 
+        boolean isConstructable(Device device, Class<?> type);
+
         boolean isDeviceImplemented(Device device);
 
         <T> T implement(Device device, Class<T> implementationType);

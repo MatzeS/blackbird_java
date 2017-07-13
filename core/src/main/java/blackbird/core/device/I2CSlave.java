@@ -67,7 +67,10 @@ public class I2CSlave extends Device {
     /**
      * TODO enchant
      */
-    public interface Interface<D extends I2CSlave> extends DInterface {
+    public interface Interface extends DInterface {
+
+        @Override
+        I2CSlave getDevice();
 
         //TODO Device getMaster();
 
@@ -135,7 +138,7 @@ public class I2CSlave extends Device {
 
     }
 
-    public static class Implementation<D extends I2CSlave> extends DImplementation<D> implements Interface<D> {
+    public static class Implementation<D extends I2CSlave> extends DImplementation implements Interface {
 
         private I2CMaster.Implementation master;
 
@@ -145,6 +148,11 @@ public class I2CSlave extends Device {
 
         private int getAddress() {
             return getDevice().getI2CAddress();
+        }
+
+        @Override
+        public I2CSlave getDevice() {
+            return (I2CSlave) super.getDevice();
         }
 
         @Override
