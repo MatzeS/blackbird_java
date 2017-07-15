@@ -18,7 +18,7 @@ import blackbird.core.util.BuildRequirement;
  */
 public abstract class DIBuilder {
 
-    protected Blackbird blackbird; //TODO extract to handle
+    private ImplementationReference implementationReference;
 
     public abstract DImplementation build(Device device);
 
@@ -53,14 +53,22 @@ public abstract class DIBuilder {
         return null;
     }
 
+    protected <T> T implement(Device device, Class<T> type) {
+        return implementationReference.implement(device, type);
+    }
+
     public abstract Class<DInterface> produces();
 
     public boolean produces(Class<?> type) {
         return produces().isAssignableFrom(type);
     }
 
-    public void setBlackbird(Blackbird blackbird) {
-        this.blackbird = blackbird;
+    public void setImplementationReference(ImplementationReference implementationReference) {
+        this.implementationReference = implementationReference;
+    }
+
+    public interface ImplementationReference {
+        <T> T implement(Device device, Class<T> type);
     }
 
 }

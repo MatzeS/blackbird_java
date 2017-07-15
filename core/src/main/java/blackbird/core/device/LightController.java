@@ -63,7 +63,7 @@ public class LightController extends SerialDevice {
 
             @Override
             public Implementation buildFromModule(LightController device, SerialDevice module, SerialDevice.Implementation moduleImpl) {
-                return new Implementation(moduleImpl);
+                return new Implementation(moduleImpl );
             }
 
             @Override

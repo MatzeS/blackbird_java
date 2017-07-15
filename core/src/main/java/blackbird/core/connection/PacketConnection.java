@@ -188,7 +188,7 @@ public abstract class PacketConnection extends Connection {
          *
          * @param event the event, containing close reason and connection
          */
-        void closed(CloseEvent event);
+        default void closed(CloseEvent event){}
 
         /**
          * Invoked when the connection receives a packet.
@@ -207,16 +207,12 @@ public abstract class PacketConnection extends Connection {
      * <p>
      * The <code>closed</code> method is default overwritten with no operation.
      */
-    public static abstract class FilteredPacketListener implements Listener, Predicate<PacketReceivedEvent> {
+    public interface FilteredPacketListener extends Listener, Predicate<PacketReceivedEvent> {
+
+        void filteredPacketReceived(PacketReceivedEvent event);
 
         @Override
-        public void closed(CloseEvent event) {
-        }
-
-        public abstract void filteredPacketReceived(PacketReceivedEvent event);
-
-        @Override
-        public void packetReceived(PacketReceivedEvent event) {
+        default void packetReceived(PacketReceivedEvent event) {
             if (test(event))
                 filteredPacketReceived(event);
         }
@@ -232,7 +228,7 @@ public abstract class PacketConnection extends Connection {
      *
      * @param <T> filter to this packet type
      */
-    public static abstract class PacketTypeListener<T> extends FilteredPacketListener {
+    public static abstract class PacketTypeListener<T> implements FilteredPacketListener {
 
         private TypeFilter<Packet> typeFilter;
 

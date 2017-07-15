@@ -1,4 +1,4 @@
-package blackbird.core.network.packets;
+package blackbird.core.packets;
 
 import blackbird.core.HostDevice;
 import blackbird.core.connection.Packet;
@@ -12,20 +12,14 @@ public class HandshakePacket extends Packet {
     private static final long serialVersionUID = 5603371753276866796L;
 
     private HostDevice device;
-    private int rmiImplementationID;
 
-    public HandshakePacket(HostDevice device, int rmiImplementationID) {
+    public HandshakePacket(HostDevice device) {
         super();
         this.device = device;
-        this.rmiImplementationID = rmiImplementationID;
     }
 
     public HostDevice getDevice() {
         return device;
-    }
-
-    public int getRmiImplementationID() {
-        return rmiImplementationID;
     }
 
 }
