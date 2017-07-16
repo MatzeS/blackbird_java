@@ -16,7 +16,7 @@ public class IRModule extends InfraredReceiver {
         }
     }
 
-    public static class Implementation extends InfraredReceiver.Implementation<IRModule> {
+    public static class Implementation extends InfraredReceiver.Implementation {
 
         public Implementation(AVRDevice.Implementation avr) {
             avr.getAVRConnection().addListener(new PacketConnection.PacketTypeListener<IRReceiveResponse>() {

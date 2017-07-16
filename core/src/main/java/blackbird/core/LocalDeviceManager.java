@@ -9,7 +9,7 @@ public class LocalDeviceManager extends DeviceManager {
 
     @Override
     protected Object extendHandle(Class<?> type) {
-        return buildHandle(type);
+        return constructHandle(type);
     }
 
 }

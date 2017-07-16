@@ -33,6 +33,15 @@ public class RCSocket extends RemoteSocket {
         return address;
     }
 
+    public void setAddress(int address) {
+        this.address = address;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), address);
+    }
+
     public void setAddress(String address) {
         if (!address.matches("[01]*"))
             throw new IllegalArgumentException("Address must consist of 0 and 1s");
@@ -43,15 +52,6 @@ public class RCSocket extends RemoteSocket {
         this.address = 0;
         for (int i = 0; i < 10; i++)
             this.address |= address.charAt(9 - i) == '1' ? (1 << i) : 0;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), address);
-    }
-
-    public void setAddress(int address) {
-        this.address = address;
     }
 
 }

@@ -24,12 +24,18 @@ public abstract class InfraredReceiver extends Device {
                                Predicate<Integer> codeFilter,
                                Consumer<Integer> action) {
         Interface impl = blackbird.interfaceDevice(infraredReceiver, Interface.class);
+        return map(impl, codeFilter, action);
+    }
+
+    public static Runnable map(InfraredReceiver.Interface handle,
+                               Predicate<Integer> codeFilter,
+                               Consumer<Integer> action) {
         Listener listener = code -> {
             if (codeFilter.test(code))
                 action.accept(code);
         };
-        impl.addListener(listener);
-        return () -> impl.removeListener(listener);
+        handle.addListener(listener);
+        return () -> handle.removeListener(listener);
     }
 
     public interface Interface<D extends InfraredReceiver> extends DInterface {
@@ -46,8 +52,8 @@ public abstract class InfraredReceiver extends Device {
 
     }
 
-    public static abstract class Implementation<D extends InfraredReceiver>
-            extends DImplementation<D> implements Interface<D> {
+    public static abstract class Implementation
+            extends DImplementation implements Interface {
 
         private ListenerList<Listener> listeners;
 

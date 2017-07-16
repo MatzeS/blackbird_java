@@ -11,7 +11,7 @@ import blackbird.core.util.Hex;
 /**
  * A port consumed by the NetworkConnector storing MAC and IP addresses.
  */
-public class NetworkPort extends DPort {
+public class NetworkPort {
 
     private static final long serialVersionUID = 5388626648137321057L;
 

@@ -2,8 +2,6 @@ package blackbird.core.device;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import blackbird.core.Blackbird;
 import blackbird.core.DImplementation;
@@ -12,7 +10,6 @@ import blackbird.core.builders.GenericBuilder;
 import blackbird.core.exception.BFException;
 import blackbird.core.interconnect.Trigger;
 import blackbird.core.rmi.Remote;
-import blackbird.core.util.BuildRequirement;
 import blackbird.core.util.ListenerList;
 
 public class MPR121 extends I2CSlave {
@@ -283,21 +280,13 @@ public class MPR121 extends I2CSlave {
 
         @Override
         public Implementation buildGeneric(MPR121 device) throws BFException {
-            I2CSlave.Interface slave = blackbird.implementDevice(device, I2CSlave.Interface.class);
-            I2CMaster.Interface master = blackbird.implementDevice(device, I2CMaster.Interface.class);
+            I2CSlave.Interface slave = implement(device, I2CSlave.Interface.class);
+            I2CMaster.Interface master = implement(device, I2CMaster.Interface.class);
             try {
                 return new Implementation(slave, master);
             } catch (IOException e) {
                 throw new BFException("Failed to load default settings", e);
             }
-        }
-
-        @Override
-        public List<BuildRequirement> getPossiblyUniqueRequirementsOf(MPR121 device) {
-            List<BuildRequirement> requirements = new ArrayList<>();
-            requirements.add(new BuildRequirement(device, I2CSlave.Interface.class));
-            requirements.add(new BuildRequirement(device.getMaster(), I2CMaster.Interface.class));
-            return requirements;
         }
 
     }
@@ -326,6 +315,11 @@ public class MPR121 extends I2CSlave {
 
         protected void fireTouchEvent(TouchEvent event) {
             listeners.fire(l -> l.changed(event));
+        }
+
+        @Override
+        public MPR121 getDevice() {
+            return (MPR121) super.getDevice();
         }
 
         private void loadDefaultConfiguration() throws IOException {

@@ -6,6 +6,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import blackbird.core.exception.BFException;
+import blackbird.core.util.ConstructionPlan;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public abstract class DeviceManager {
@@ -26,6 +29,15 @@ public abstract class DeviceManager {
 
         this.device = device;
         implementationStack = new Stack<>();
+    }
+
+    protected Object constructHandle(Class<?> type) {
+        ConstructionPlan plan = blackbird.constructHandle(new ConstructionPlan(device, type));
+
+        if (!plan.succeeded())
+            throw new BFException("could not implement");
+
+        return blackbird.interfaceHost(plan.getSucceeded()).interfaceDevice(device, type);
     }
 
     protected abstract Object extendHandle(Class<?> type);

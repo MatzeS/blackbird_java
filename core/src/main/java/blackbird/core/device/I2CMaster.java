@@ -34,7 +34,7 @@ public class I2CMaster extends Device {
         void commonInterruptOccurred();
     }
 
-    public static abstract class Implementation extends DImplementation<I2CMaster>
+    public static abstract class Implementation extends DImplementation
             implements Interface {
 
         private ListenerList<Listener> listeners;
@@ -51,10 +51,6 @@ public class I2CMaster extends Device {
             listeners.fire(Listener::commonInterruptOccurred);
         }
 
-        public void removeListener(Listener listener) {
-            listeners.remove(listener);
-        }
-
         @Override
         public byte[] readRegisters(int slaveAddress, byte registerAddress, int num) throws IOException {
             if (num <= 0)
@@ -64,6 +60,10 @@ public class I2CMaster extends Device {
             for (int i = 0; i < num; i++)
                 data[i] = readRegister(slaveAddress, (byte) (registerAddress + num));
             return data;
+        }
+
+        public void removeListener(Listener listener) {
+            listeners.remove(listener);
         }
 
         @Override

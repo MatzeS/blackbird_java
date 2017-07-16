@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import blackbird.core.ComponentDIBuilder;
-import blackbird.core.ComponentImplementation;
+import blackbird.core.Blackbird;
+import blackbird.core.DImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
+import blackbird.core.builders.GenericBuilder;
+import blackbird.core.exception.BFException;
 import blackbird.core.util.ListenerList;
 
 
@@ -18,13 +20,10 @@ public class AppleRemote extends Device {
     private static final long serialVersionUID = -8776848175725433375L;
 
     private byte remoteID;
+    private Port port;
 
-    public AppleRemote(String name, byte remoteID) {
-        super(name);
-
-        this.remoteID = remoteID;
-
-        getUIData().put("iconName", "ic_satellite");
+    public AppleRemote() {
+        getUIProperties().put("iconName", "ic_satellite");
     }
 
     @Override
@@ -36,6 +35,10 @@ public class AppleRemote extends Device {
         return remoteID == that.remoteID;
     }
 
+    public Port getPort() {
+        return port;
+    }
+
     public byte getRemoteID() {
         return remoteID;
     }
@@ -45,8 +48,8 @@ public class AppleRemote extends Device {
         return Objects.hash(super.hashCode(), remoteID);
     }
 
-    public static Runnable map(AppleRemote remote, Predicate<Code> code, Runnable action) {
-        Interface impl = remote.getInterface(Interface.class);
+    public static Runnable map(Blackbird blackbird, AppleRemote remote, Predicate<Code> code, Runnable action) {
+        Interface impl = blackbird.interfaceDevice(remote, Interface.class);
         Listener listener = new KeyMapper(code, action);
         impl.addListener(listener);
         return () -> impl.removeListener(listener);
@@ -113,19 +116,23 @@ public class AppleRemote extends Device {
     }
 
     public static class Implementation
-            extends ComponentImplementation<AppleRemote, DInterface>
+            extends DImplementation
             implements Interface {
 
         private ListenerList<Listener> listeners;
 
-        public Implementation(DInterface component) {
-            super(component);
+        public Implementation() {
             this.listeners = new ListenerList<>();
         }
 
         @Override
         public void addListener(Listener listener) {
             listeners.add(listener);
+        }
+
+        @Override
+        public AppleRemote getDevice() {
+            return (AppleRemote) super.getDevice();
         }
 
         public Listener map(Predicate<Code> code, Runnable run) {
@@ -140,24 +147,24 @@ public class AppleRemote extends Device {
         }
 
         public static class Builder extends
-                ComponentDIBuilder<AppleRemote, Interface, Port, DInterface> {
-
-            public Builder() {
-                setPortType(null);
-            }
+                GenericBuilder<AppleRemote, Interface> {
 
             @Override
-            public Interface build(AppleRemote device, Port port,
-                                   DInterface componentInterface) {
-                Implementation impl = new Implementation(componentInterface);
+            public Interface buildGeneric(AppleRemote device) throws BFException {
 
-                port.getReceivers().forEach(d ->
-                        InfraredReceiver.map(d,
-                                code -> new Code(code).is(device.getRemoteID()),
-                                code -> impl.listeners.fire(l -> l.codeReceived(new Code(code)))
-                        ));
+                Implementation impl = new Implementation();
+
+
+                device.getPort().getReceivers().stream()
+                        .map(r -> implement(r, InfraredReceiver.Interface.class))
+                        .forEach(r ->
+                                InfraredReceiver.map(r,
+                                        code -> new Code(code).is(device.getRemoteID()),
+                                        code -> impl.listeners.fire(l -> l.codeReceived(new Code(code)))
+                                ));
 
                 return impl;
+
             }
 
         }
@@ -189,7 +196,7 @@ public class AppleRemote extends Device {
 
     }
 
-    public static class Port extends DPort {
+    public static class Port {
 
         private List<InfraredReceiver> receivers;
 

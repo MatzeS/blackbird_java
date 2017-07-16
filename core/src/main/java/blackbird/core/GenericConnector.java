@@ -1,5 +1,6 @@
 package blackbird.core;
 
+import blackbird.core.connection.Connection;
 import blackbird.core.connection.exceptions.NoConnectionException;
 import blackbird.core.util.Generics;
 
@@ -31,7 +32,7 @@ public abstract class GenericConnector<D extends HostDevice, P extends DPort> im
 
     public abstract Connection connect(D device, P port) throws NoConnectionException;
 
-    public Connection connectTo(HostDevice device, DPort port) throws NoConnectionException {
+    public Connection connectTo(HostDevice device) throws NoConnectionException {
         if (!deviceType.isAssignableFrom(device.getClass()))
             throw new NoConnectionException("Connector expects a " + deviceType);
 

@@ -42,7 +42,7 @@ public abstract class SuperImplBuilder<D extends Device,
         recursionBlock.add(device);
         listLock.unlock();
 
-        SI superImpl = blackbird.implementDevice(device, superImplType);
+        SI superImpl = implement(device, superImplType);
 
         listLock.lock();
         recursionBlock.remove(device);

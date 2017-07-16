@@ -137,7 +137,7 @@ public abstract class Socket extends Device {
 
         @Override
         public Socket getDevice() {
-            return (Socket) device;
+            return (Socket) super.getDevice();
         }
 
         @Override

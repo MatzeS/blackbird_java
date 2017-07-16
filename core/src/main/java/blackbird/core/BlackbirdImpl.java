@@ -3,16 +3,22 @@ package blackbird.core;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import blackbird.core.HostDevice.Interface;
 import blackbird.core.builders.DIBuilder;
+import blackbird.core.exception.OtherHostException;
+import blackbird.core.util.ConstructionPlan;
 import blackbird.core.util.ValueKeyedMap;
 
 //TODO threadsafety
+//TODO hosthopping
 public class BlackbirdImpl implements Blackbird {
 
 
@@ -20,12 +26,63 @@ public class BlackbirdImpl implements Blackbird {
     private Cluster cluster;
     private ValueKeyedMap<Device, DeviceManager> deviceManagers;
     private List<DIBuilder> builders;
+    private List<Connector> connectors;
 
+    private HostDevice localDevice;
 
     public BlackbirdImpl() {
 
         deviceManagers = new ValueKeyedMap<>(DeviceManager::getDevice);
 
+    }
+
+    protected ConstructionPlan constructHandle(ConstructionPlan plan) {
+        Device device = plan.getDevice();
+
+        List<HostDevice> otherHosts = new ArrayList<>();
+
+        for (DIBuilder builder : getBuilders())
+            if (builder.canBuild(device) && builder.produces(plan.getType())) { // pre filter
+
+                try {
+                    DImplementation impl = builder.build(device);
+
+                    impl.setDevice(device);
+                    impl.setHost(getLocalDevice());
+
+                    //TODO call after construction/load state
+                    //TODO call devicemanager postconstruction
+
+                    getDeviceManager(device).getImplementationStack().push(impl);
+
+                    plan.setSucceeded(getLocalDevice());
+
+                    return plan;
+
+                } catch (OtherHostException e) {
+
+                    otherHosts.add(e.getHost());
+
+                } catch (Exception ignored) {
+                }
+
+            }
+
+        plan.addFailed(getLocalDevice());
+        plan.addPossibleHosts(otherHosts);
+
+        if (plan.getPossible().isEmpty())
+            return plan;
+
+        ConstructionPlan finalPlan = plan;
+        List<Entry<HostDevice, Interface>> possibleHosts =
+                getAvailableHostDeviceInterfaces().entrySet().stream()
+                        .filter(e -> finalPlan.getPossible().contains(e.getKey()))
+                        .collect(Collectors.toList());
+        for (Entry<HostDevice, HostDevice.Interface> possibleHost : possibleHosts)
+            plan = possibleHost.getValue().constructHandle(plan);
+
+        return plan;
     }
 
     public Map<HostDevice, HostDevice.Interface> getAvailableHostDeviceInterfaces() {
@@ -47,7 +104,7 @@ public class BlackbirdImpl implements Blackbird {
     }
 
     public List<Connector> getConnectors() {
-        //TODO
+        return connectors;
     }
 
     protected DeviceManager getDeviceManager(Device device) {
@@ -69,7 +126,7 @@ public class BlackbirdImpl implements Blackbird {
     }
 
     public HostDevice getLocalDevice() {
-        //TODO
+        return localDevice;
     }
 
     @Override
@@ -82,6 +139,7 @@ public class BlackbirdImpl implements Blackbird {
     }
 
     public boolean isLocalDevice(Device device) {
+        return getLocalDevice().equals(device);
     }
 
     @Override
@@ -89,6 +147,5 @@ public class BlackbirdImpl implements Blackbird {
         return getDeviceManager(device)
                 .isLocallyImplemented();
     }
-
 
 }

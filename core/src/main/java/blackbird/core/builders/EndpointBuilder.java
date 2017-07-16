@@ -2,11 +2,9 @@ package blackbird.core.builders;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import blackbird.core.Device;
 import blackbird.core.exception.BFException;
-import blackbird.core.util.BuildRequirement;
 import blackbird.core.util.Generics;
 
 public abstract class EndpointBuilder<
@@ -31,11 +29,11 @@ public abstract class EndpointBuilder<
     @Override
     public I buildGeneric(D device) throws BFException {
         for (E endpoint : getEndpoints(device))
-            if (blackbird.isLocallyImplemented(endpoint)) {
-                EI endpointImpl = blackbird.
-                        implementDevice(endpoint, endpointInterfaceType);
+            try {
+                EI endpointImpl = implement(endpoint, endpointInterfaceType);
 
                 return buildFromEndpoint(device, endpoint, endpointImpl);
+            } catch (Exception ignored) {
             }
 
         throw new BFException("no port, no endpoint or endpoint not implemented");
@@ -50,15 +48,6 @@ public abstract class EndpointBuilder<
             return false; // no endpoints
 
         return true;
-    }
-
-
-    @Override
-    public List<List<BuildRequirement>> getBuildRequirements(Device device) {
-        return getEndpoints((D) device).stream()
-                .map(e -> BuildRequirement.
-                        singleBuildRequirement(e, endpointInterfaceType))
-                .collect(Collectors.toList());
     }
 
     public List<E> getEndpoints(D device) {

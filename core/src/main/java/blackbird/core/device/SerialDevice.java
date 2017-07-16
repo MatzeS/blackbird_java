@@ -17,7 +17,7 @@ public class SerialDevice extends Device {
     }
 
     public static class Implementation
-            extends DImplementation<SerialDevice> implements Interface {
+            extends DImplementation implements Interface {
 
         private SerialConnection serialConnection;
 

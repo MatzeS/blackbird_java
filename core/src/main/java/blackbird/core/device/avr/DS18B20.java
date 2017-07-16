@@ -21,20 +21,20 @@ public class DS18B20 extends TemperatureSensor {
         return address;
     }
 
-    public void setAddress(long address) {
-        this.address = address;
+    public void setAddress(byte[] address) {
+        setAddress(ByteHelper.decode8Byte(address));
     }
 
     public AVRDevice getMaster() {
         return master;
     }
 
-    public void setAddress(String address) {
-        setAddress(ByteHelper.hexStringToByteArray(address));
+    public void setAddress(long address) {
+        this.address = address;
     }
 
-    public void setAddress(byte[] address) {
-        setAddress(ByteHelper.decode8Byte(address));
+    public void setAddress(String address) {
+        setAddress(ByteHelper.hexStringToByteArray(address));
     }
 
     public interface Interface extends TemperatureSensor.Interface {
@@ -51,7 +51,7 @@ public class DS18B20 extends TemperatureSensor {
         }
 
         @Override
-        public DS18B20 getDevice(){
+        public DS18B20 getDevice() {
             return (DS18B20) super.getDevice();
         }
 

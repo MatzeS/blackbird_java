@@ -2,14 +2,11 @@ package blackbird.core.device;
 
 import java.io.IOException;
 
-import blackbird.core.ComponentDIBuilder;
-import blackbird.core.ComponentImplementation;
 import blackbird.core.DImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
-import blackbird.core.builders.ModuleDIBuilder;
+import blackbird.core.builders.ModuleBuilder;
 import blackbird.core.connection.serial.SerialConnection;
-import blackbird.core.device.SerialDevice.Implementation;
 import blackbird.core.util.Color;
 
 public class LightController extends SerialDevice {
@@ -36,7 +33,7 @@ public class LightController extends SerialDevice {
         }
 
         @Override
-        public LightController getDevice(){
+        public LightController getDevice() {
             return (LightController) super.getDevice();
         }
 
@@ -59,16 +56,16 @@ public class LightController extends SerialDevice {
         }
 
 
-        public static class Builder extends ModuleDIBuilder<LightController, Implementation, SerialDevice, SerialDevice.Implementation> {
+        public static class Builder extends ModuleBuilder<LightController, Implementation, SerialDevice, SerialDevice.Implementation> {
 
             @Override
             public Implementation buildFromModule(LightController device, SerialDevice module, SerialDevice.Implementation moduleImpl) {
-                return new Implementation(moduleImpl );
+                return new Implementation(moduleImpl);
             }
 
             @Override
             public Device getModule(LightController device) {
-                return device.getModule();//TODO
+                return device.getModule("asdf");//TODO
             }
         }
 

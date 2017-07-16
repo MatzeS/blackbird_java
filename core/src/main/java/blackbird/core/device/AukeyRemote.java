@@ -2,11 +2,10 @@ package blackbird.core.device;
 
 import java.io.IOException;
 
-import blackbird.core.ComponentImplementation;
+import blackbird.core.DImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
-import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.ports.ParentDevicePort;
+import blackbird.core.builders.ModuleBuilder;
 
 import static blackbird.core.avr.DigitalPinValue.HIGH;
 import static blackbird.core.avr.DigitalPinValue.LOW;
@@ -15,9 +14,8 @@ public class AukeyRemote extends Device {
 
     private static final long serialVersionUID = -7567884786987932459L;
 
-    public AukeyRemote(String name) {
-        super(name);
-        getUIData().put("iconName", "ic_remote");
+    public AukeyRemote() {
+        getUIProperties().put("iconName", "ic_remote");
     }
 
     public interface Interface extends DInterface {
@@ -25,7 +23,7 @@ public class AukeyRemote extends Device {
         void switchSocket(int num, int state);
     }
 
-    public static class Implementation extends ComponentImplementation<AukeyRemote, DInterface> implements Interface {
+    public static class Implementation extends DImplementation implements Interface {
 
         public static final MCP23017.Pin OFF_PIN = MCP23017.Pin.B7;
         public static final MCP23017.Pin ON_PIN = MCP23017.Pin.B5;
@@ -36,8 +34,7 @@ public class AukeyRemote extends Device {
 
         MCP23017.Interface mcp;
 
-        public Implementation(DInterface component, MCP23017.Interface mcp) throws ImplementationFailedException {
-            super(component);
+        public Implementation(MCP23017.Interface mcp) {
             this.mcp = mcp;
 
             try {
@@ -53,7 +50,7 @@ public class AukeyRemote extends Device {
                 mcp.digitalWrite(SOCKET_2_PIN, LOW);
                 mcp.digitalWrite(STATE_LED_PIN, HIGH);
             } catch (IOException e) {
-                throw new ImplementationFailedException("IO Exception during initializing aukey remote, " +
+                throw new RuntimeException("IO Exception during initializing aukey remote, " +
                         "system may be in inconsistent", e);
             }
         }
@@ -93,13 +90,18 @@ public class AukeyRemote extends Device {
             }
         }
 
-        public static class Builder extends ParentDevicePort.Builder<AukeyRemote, Interface, MCP23017, MCP23017.Interface> {
+        public static class Builder extends ModuleBuilder<AukeyRemote, Interface, MCP23017, MCP23017.Interface> {
 
             @Override
-            public Interface assemble(DInterface component, MCP23017.Interface parentInterface)
-                    throws ImplementationFailedException {
-                return new Implementation(component, parentInterface);
+            public Interface buildFromModule(AukeyRemote device, MCP23017 module, MCP23017.Interface moduleImpl) {
+                return new Implementation(moduleImpl);
             }
+
+            @Override
+            public Device getModule(AukeyRemote device) {
+                return device.getModule("mcp");
+            }
+
         }
 
     }

@@ -12,7 +12,7 @@ import blackbird.core.HostDevice.Interface;
 
 public class RemoteImplementationHelper {
 
-    public static <T> T getRemoteImpl(Blackbird blackbird, DeviceManager deviceManager, Class<T> type) {
+/*    public static <T> T getRemoteImpl(Blackbird blackbird, DeviceManager deviceManager, Class<T> type) {
         getLock().lock();
         try {
 
@@ -88,6 +88,6 @@ public class RemoteImplementationHelper {
             getLock().unlock();
         }
 
-    }
+    }*/
 
 }

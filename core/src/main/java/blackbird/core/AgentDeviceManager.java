@@ -3,10 +3,11 @@ package blackbird.core;
 import java.util.List;
 import java.util.Map.Entry;
 
-import blackbird.core.builders.DIBuilder;
 import blackbird.core.builders.DIBuilder.ImplementationReference;
 import blackbird.core.exception.BFException;
+import blackbird.core.exception.OtherHostException;
 import blackbird.core.util.BuildRequirement;
+import blackbird.core.util.ConstructionPlan;
 
 /**
  * TODO lock builder
@@ -17,41 +18,6 @@ public class AgentDeviceManager extends DeviceManager {
 
     public AgentDeviceManager(BlackbirdImpl blackbird, Device device) {
         super(blackbird, device);
-    }
-
-    private Object buildHandle(Class<?> type) {
-
-        for (DIBuilder builder : blackbird.getBuilders())
-            if (builder.canBuild(device) && builder.produces(type)) {
-
-                builder.setImplementationReference(implRef);
-                try {
-                    DImplementation impl = builder.build(device);
-
-
-                    impl.setDevice(device);
-                    impl.setHost(blackbird.getLocalDevice());
-
-                    //TODO call after construction/load state
-
-                    implementationStack.push(impl);
-                    return impl;
-
-                } catch (Exception e) {
-                }
-
-            }
-
-        throw new BFException("no builder succeeded");
-
-    }
-
-    private Object constructHandle(Class<?> type) {
-
-        implRef.getList().clear();
-        return buildHandle(type);
-
-
     }
 
     @Override
@@ -65,21 +31,21 @@ public class AgentDeviceManager extends DeviceManager {
     }
 
     private boolean isRemoteImplemented() {
-        if(isLocallyImplemented())
+        if (isLocallyImplemented())
             return false;
 
         if (getRemoteHandle().isPresent())
             return true;
 
         return blackbird.getAvailableHostDeviceInterfaces().entrySet().stream()
-                .filter(e -> e.getValue().hasDeviceImplementation(device))
+                .filter(e -> e.getValue().isDeviceLocallyImplemented(device))
                 .count() > 0;
     }
 
     private Object remoteImplement(Class<?> type) {
         Object impl = blackbird.getAvailableHostDeviceInterfaces().entrySet().stream()
                 .map(Entry::getValue)
-                .filter(i -> i.isDeviceImplemented(device))
+                .filter(i -> i.isDeviceLocallyImplemented(device))
                 .map(i -> i.interfaceDevice(device, type))
                 .findAny().get();
         remoteHandle = (DInterface) impl;
@@ -103,7 +69,7 @@ public class AgentDeviceManager extends DeviceManager {
                 if (blackbird.isLocalDevice(device))
                     return blackbird.interfaceDevice(device, type); // own host
                 else
-                    throw new BFException("asdf"); // other host
+                    throw new OtherHostException((HostDevice) device); // other host
 
             AgentDeviceManager manager = (AgentDeviceManager) blackbird.getDeviceManager(device);
 
