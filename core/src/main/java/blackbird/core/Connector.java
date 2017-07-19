@@ -1,6 +1,7 @@
 package blackbird.core;
 
 import blackbird.core.builders.DIBuilder;
+import blackbird.core.connection.Connection;
 import blackbird.core.connection.exceptions.NoConnectionException;
 
 /**
@@ -16,7 +17,7 @@ import blackbird.core.connection.exceptions.NoConnectionException;
 public interface Connector {
 
     /**
-     * The general contract for <code>connectTo</code> is to return a fresh connection
+     * The general contract for <code>connect</code> is to return a fresh connection
      * with no communication done including no handshake and no remote side device check
      * or throw an exception.
      * <p>
@@ -27,6 +28,6 @@ public interface Connector {
      * @return the connection, not null
      * @throws NoConnectionException if the connection could not be established
      */
-    Connection connectTo(HostDevice device, DPort port) throws NoConnectionException;
+    Connection connect(HostDevice device) throws NoConnectionException;
 
 }

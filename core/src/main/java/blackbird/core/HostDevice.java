@@ -1,6 +1,6 @@
 package blackbird.core;
 
-import java.util.Objects;
+import blackbird.core.util.ConstructionPlan;
 
 /**
  * A device running a blackbird instance like this.
@@ -18,27 +18,14 @@ public class HostDevice extends Device {
      */
     public interface Interface extends DInterface {
 
-        void destroyDeviceImplementation(Device device);
+        /**
+         * constructs the device in the cluster and tells the final host
+         */
+        ConstructionPlan constructHandle(ConstructionPlan plan);
 
-        boolean hasDeviceImplementation(Device device);
+        Object interfaceDevice(Device device, Class<?> type);
 
-        <T> T interfaceDevice(Device device, Class<T> interfaceType);
-
-        boolean isConstructable(Device device, Class<?> type);
-
-        boolean isDeviceImplemented(Device device);
-
-        <T> T implement(Device device, Class<T> implementationType);
-
-        int getImplementationDistanceTo(Device device);
-    }
-
-    public static abstract class Implementation
-            extends ComponentImplementation<HostDevice, DInterface> implements Interface {
-
-        public Implementation(DInterface component) {
-            super(component);
-        }
+        boolean isDeviceLocallyImplemented(Device device);
 
     }
 

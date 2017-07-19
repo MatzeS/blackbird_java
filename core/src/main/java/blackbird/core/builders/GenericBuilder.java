@@ -1,12 +1,9 @@
 package blackbird.core.builders;
 
-import java.util.List;
-
 import blackbird.core.DImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
 import blackbird.core.exception.BFException;
-import blackbird.core.util.BuildRequirement;
 import blackbird.core.util.Generics;
 
 /**
@@ -51,39 +48,12 @@ public abstract class GenericBuilder<D extends Device, I> extends DIBuilder {
         return true;
     }
 
-    @Override
-    public List<List<BuildRequirement>> getBuildRequirements(Device device) {
-        return getBuildRequirementsOf((D) device);
-    }
-
-    public List<List<BuildRequirement>> getBuildRequirementsOf(D device){
-        return super.getBuildRequirements(device);
-    }
-
     public Class<D> getDeviceType() {
         return deviceType;
     }
 
     public Class<I> getInterfaceType() {
         return interfaceType;
-    }
-
-    @Override
-    public List<BuildRequirement> getPossiblyUniqueRequirements(Device device) {
-        return getPossiblyUniqueRequirementsOf((D) device);
-    }
-
-    public List<BuildRequirement> getPossiblyUniqueRequirementsOf(D device){
-        return super.getPossiblyUniqueRequirements(device);
-    }
-
-    @Override
-    public BuildRequirement getPossiblyUniqueSingleRequirement(Device device) {
-        return getPossiblyUniqueSingleRequirementOf((D) device);
-    }
-
-    public BuildRequirement getPossiblyUniqueSingleRequirementOf(D device){
-        return super.getPossiblyUniqueSingleRequirement(device);
     }
 
     @Override

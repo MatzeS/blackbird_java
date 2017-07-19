@@ -2,20 +2,14 @@ package blackbird.core.device;
 
 import java.util.Objects;
 
-import blackbird.core.DInterface;
-import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.ports.ParentDevicePort;
+import blackbird.core.builders.EndpointBuilder;
 
 public class AukeySocket extends RemoteSocket {
 
     private static final long serialVersionUID = -3612748815785045148L;
 
     private int socketNum;
-
-    public AukeySocket(String name, int socketNum) {
-        super(name);
-        this.socketNum = socketNum;
-    }
+    private AukeyRemote remote;
 
     @Override
     public boolean equals(Object o) {
@@ -26,8 +20,21 @@ public class AukeySocket extends RemoteSocket {
         return socketNum == that.socketNum;
     }
 
+    public AukeyRemote getRemote() {
+
+        return remote;
+    }
+
+    public void setRemote(AukeyRemote remote) {
+        this.remote = remote;
+    }
+
     public int getSocketNum() {
         return socketNum;
+    }
+
+    public void setSocketNum(int socketNum) {
+        this.socketNum = socketNum;
     }
 
     @Override
@@ -39,8 +46,7 @@ public class AukeySocket extends RemoteSocket {
 
         private AukeyRemote.Interface remote;
 
-        public Implementation(DInterface component, AukeyRemote.Interface remote) {
-            super(component);
+        public Implementation(AukeyRemote.Interface remote) {
             this.remote = remote;
         }
 
@@ -57,12 +63,16 @@ public class AukeySocket extends RemoteSocket {
         }
 
         public static class Builder
-                extends ParentDevicePort.Builder<AukeySocket, Interface, AukeyRemote, AukeyRemote.Interface> {
+                extends EndpointBuilder<AukeySocket, Interface, AukeyRemote, AukeyRemote.Interface> {
 
             @Override
-            public Interface assemble(DInterface component, AukeyRemote.Interface parentInterface)
-                    throws ImplementationFailedException {
-                return new Implementation(component, parentInterface);
+            public Interface buildFromEndpoint(AukeySocket device, AukeyRemote endpoint, AukeyRemote.Interface endpointImpl) {
+                return new Implementation(endpointImpl);
+            }
+
+            @Override
+            public AukeyRemote getSingleEndpoint(AukeySocket device) {
+                return device.getRemote();
             }
         }
 

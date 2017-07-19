@@ -3,7 +3,6 @@ package blackbird.core.cluster;
 import java.util.ArrayList;
 import java.util.List;
 
-import blackbird.core.DPort;
 import blackbird.core.Domain;
 import blackbird.core.device.I2CMaster;
 import blackbird.core.device.I2CSlave;

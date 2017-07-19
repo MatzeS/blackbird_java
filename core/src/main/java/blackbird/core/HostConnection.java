@@ -12,6 +12,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 
+import blackbird.core.connection.CloseReason;
+import blackbird.core.connection.Connection;
+import blackbird.core.connection.Packet;
+import blackbird.core.connection.PacketConnection;
+
 /**
  * The class provides the general connection implementation for {@link HostDevice}s
  * using ObjectInput/OutputStreams to encode XML Strings produced from {@link Packet}s via XStream.
@@ -28,7 +33,7 @@ public class HostConnection extends PacketConnection implements Runnable {
     private DecompressibleInputStream objectInputStream;
 
     public HostConnection(Connection componentConnection) throws IOException {
-        super(componentConnection);
+        super(componentConnection); // delegate
 
 
         //WELL, we are fucked!

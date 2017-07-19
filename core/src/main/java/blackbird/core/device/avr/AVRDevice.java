@@ -11,7 +11,7 @@ import blackbird.core.avr.packets.BasicPinQuery;
 import blackbird.core.avr.packets.BasicPinResponse;
 import blackbird.core.avr.packets.DeviceIdentificationQuery;
 import blackbird.core.avr.packets.DeviceIdentificationResponse;
-import blackbird.core.builders.ModuleDIBuilder;
+import blackbird.core.builders.ModuleBuilder;
 import blackbird.core.connection.serial.SerialConnection;
 import blackbird.core.device.SerialDevice;
 import blackbird.core.exception.BFException;
@@ -150,7 +150,7 @@ public class AVRDevice extends Device {
     }
 
     public static class SerialModuleBuilder extends
-            ModuleDIBuilder<AVRDevice, Implementation, SerialDevice, SerialDevice.Implementation> {
+            ModuleBuilder<AVRDevice, Implementation, SerialDevice, SerialDevice.Implementation> {
 
         public static final String SERIAL_MODULE_IDENTIFIER = "blackbird.core.device.avr.AVRDevice.SerialModuleBuilder.SERIAL_MODULE_IDENTIFIER";
 

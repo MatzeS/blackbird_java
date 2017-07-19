@@ -75,6 +75,10 @@ public class Device implements Serializable {
         return id;
     }
 
+    public boolean isHost() {
+        return this instanceof HostDevice;
+    }
+
     public void setID(String id) {
 
         this.id = id;

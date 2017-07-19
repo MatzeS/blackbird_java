@@ -5,7 +5,7 @@ import blackbird.core.exception.BNFException;
 import blackbird.core.util.BuildRequirement;
 import blackbird.core.util.Generics;
 
-public abstract class ModuleDIBuilder<D extends Device,
+public abstract class ModuleBuilder<D extends Device,
         I,
         M extends Device,
         MI>
@@ -14,7 +14,7 @@ public abstract class ModuleDIBuilder<D extends Device,
     protected Class<M> moduleType;
     protected Class<MI> moduleInterfaceType;
 
-    public ModuleDIBuilder() {
+    public ModuleBuilder() {
         moduleType = (Class<M>)
                 Generics.getGenericArgument(this, 2);
         moduleInterfaceType = (Class<MI>)
@@ -31,16 +31,11 @@ public abstract class ModuleDIBuilder<D extends Device,
         if (!moduleType.isAssignableFrom(module.getClass()))
             throw new BNFException("module of unexpected type");
 
-        MI moduleImpl = blackbird.implementDevice(module, moduleInterfaceType);
+        MI moduleImpl = implement(module, moduleInterfaceType);
 
         return buildFromModule(device, (M) module, moduleImpl);
     }
 
     public abstract Device getModule(D device);
-
-    @Override
-    public BuildRequirement getPossiblyUniqueSingleRequirement(Device device) {
-        return new BuildRequirement(getModule((D) device), moduleInterfaceType);
-    }
 
 }
