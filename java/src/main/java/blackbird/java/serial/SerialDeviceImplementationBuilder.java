@@ -2,34 +2,39 @@ package blackbird.java.serial;
 
 import java.io.IOException;
 
-import blackbird.core.ComponentDIBuilder;
-import blackbird.core.DInterface;
-import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.device.SerialDevice;
+import blackbird.core.builders.GenericBuilder;
 import blackbird.core.connection.serial.SerialConnection;
 import blackbird.core.connection.serial.SerialPort;
+import blackbird.core.device.SerialDevice;
+import blackbird.core.device.SerialDevice.Implementation;
+import blackbird.core.device.SerialDevice.Port;
+import blackbird.core.exception.BFException;
 
 public class SerialDeviceImplementationBuilder
-        extends ComponentDIBuilder<SerialDevice, SerialDevice.Implementation, SerialDevice.Port, DInterface> {
+        extends GenericBuilder<SerialDevice, Implementation> {
 
     @Override
-    public SerialDevice.Implementation build(SerialDevice device, SerialDevice.Port port, DInterface componentInterface) {
-        if(!blackbird.getLocalDevice().equals(port.getHost()))
-            throw new ImplementationFailedException("serail device is not attached to this device");
+    public Implementation buildGeneric(SerialDevice device) throws BFException {
+        Port port = device.getPort();
+
+//        if (!getLocalDevice().equals(port.getHost()))
+//            throw new BFException("serail device is not attached to this device");
+//TODO
 
         try {
-            SerialConnection serialConnection = new SerialConnection(getSerialPort(port.getPort(), port.getBaudRate()));
 
+            SerialConnection serialConnection =
+                    new SerialConnection(getSerialPort(port.getPort(), port.getBaudRate()));
             Thread.sleep(2000);
-            return new SerialDevice.Implementation(componentInterface, serialConnection);
-        } catch (IOException e) {
-            throw new ImplementationFailedException("error todo, ioException", e);
-        } catch (InterruptedException e) {
-            throw new ImplementationFailedException("interrupted");
+            return new SerialDevice.Implementation(serialConnection);
+
+        } catch (InterruptedException | IOException e) {
+            throw new BFException(e);
         }
+
     }
 
-        private static SerialPort getSerialPort(String portIdentifier, int baudRate) throws IOException {
+    private static SerialPort getSerialPort(String portIdentifier, int baudRate) throws IOException {
         //RXTXSerialPort port = new RXTXSerialPort();
         PJCSerialPort port = new PJCSerialPort();
         port.connect(portIdentifier, baudRate, 2000);
@@ -39,6 +44,7 @@ public class SerialDeviceImplementationBuilder
     public static void scan() {
         PJCSerialPort.scan();
     }
+
 
 }
 

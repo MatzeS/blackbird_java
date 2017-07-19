@@ -2,6 +2,7 @@ package blackbird.core;
 
 import org.apache.commons.lang3.NotImplementedException;
 
+import blackbird.core.builders.GenericBuilder;
 import blackbird.core.exception.ImplementationFailedException;
 
 /**
@@ -10,21 +11,8 @@ import blackbird.core.exception.ImplementationFailedException;
  * It is created only by its local {@link Builder} and exists in the blackbird instance of the host itself.
  */
 public class LocalHostDeviceImplementation
-        extends ComponentImplementation<HostDevice, DInterface> implements HostDevice.Interface {
+        extends DImplementation implements HostDevice.Interface {
 
-    private LocalHostDeviceImplementation(DInterface component) {
-        super(component);
-    }
-
-    @Override
-    public void destroyDeviceImplementation(Device device) {
-        throw new NotImplementedException("not implemented..."); //TODO
-    }
-
-    @Override
-    public boolean hasDeviceImplementation(Device device) {
-        return device.
-    }
 
     @Override
     public <T> T interfaceDevice(Device device, Class<T> interfaceType) {
