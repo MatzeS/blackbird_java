@@ -1,5 +1,8 @@
 package blackbird.core.connection;
 
+import blackbird.core.connection.exceptions.NoReplyException;
+import blackbird.core.util.ListenerList;
+import blackbird.core.util.TypeFilter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,10 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.ParameterizedType;
 import java.util.function.Predicate;
-
-import blackbird.core.connection.exceptions.NoReplyException;
-import blackbird.core.util.ListenerList;
-import blackbird.core.util.TypeFilter;
 
 /**
  * This class establishes the event driven {@link Packet} layer on top of the genuine {@link Connection}.
@@ -22,69 +21,104 @@ import blackbird.core.util.TypeFilter;
  */
 public abstract class PacketConnection extends Connection {
 
+    public static final int DEFAULT_TIMEOUT = 2000;
     private Logger logger = LogManager.getLogger(PacketConnection.class);
-
     /**
      * The delegation object for the connection.
      */
     private Connection componentConnection;
     private ListenerList<Listener> listeners;
 
+
     public PacketConnection(Connection componentConnection) {
+
         this.componentConnection = componentConnection;
 
         listeners = new ListenerList<>();
     }
 
+
+    private static Predicate<Packet> getAnswerFilter(Packet request) {
+
+        return a -> a.getAnswerTo().equals(request.getID());
+    }
+
+
+    private static Predicate<Packet> getTypeFilter(Class<?> type) {
+
+        return new TypeFilter<>(type);
+    }
+
+
     public void addListener(Listener listener) {
+
         listeners.add(listener);
     }
 
+
     @Override
     public void close() throws IOException {
+
         componentConnection.close();
     }
 
+
     protected void fireClosed(CloseReason reason) {
+
         logger.trace("connection closed " + reason);
         CloseEvent e = new CloseEvent(this, reason);
         listeners.fire(l -> l.closed(e));
     }
 
+
     protected void firePacketReceived(Packet packet) {
+
         logger.trace("received " + packet.getClass().getSimpleName() + "/" + packet.hashCode());
         PacketReceivedEvent e = new PacketReceivedEvent(PacketConnection.this, packet);
         listeners.fire(l -> l.packetReceived(e));
     }
 
+
     @Override
     public CloseReason getCloseReason() {
+
         return componentConnection.getCloseReason();
     }
 
+
     @Override
     public void setCloseReason(CloseReason closeReason) {
+
         componentConnection.setCloseReason(closeReason);
     }
 
+
     @Override
     public InputStream getInputStream() throws IOException {
+
         return componentConnection.getInputStream();
     }
 
+
     @Override
     public OutputStream getOutputStream() throws IOException {
+
         return componentConnection.getOutputStream();
     }
 
+
     @Override
     public boolean isClosed() {
+
         return componentConnection.isClosed();
     }
 
+
     public void removeListener(Listener listener) {
+
         listeners.remove(listener);
     }
+
 
     /**
      * Sends the packet through the connection (using the output stream).
@@ -94,25 +128,50 @@ public abstract class PacketConnection extends Connection {
      */
     public abstract void send(Packet packet) throws IOException;
 
+
     /**
      * <code>timeout</code> preset with
      * {@link PacketConnection.SynchronousListener#DEFAULT_TIMEOUT}
      *
      * @see PacketConnection#sendAndReceive(Packet, Predicate, long)
      */
-    public <R extends Packet> R sendAndReceive(Packet request, Class<R> expectedPacketType) throws IOException {
-        return sendAndReceive(request, expectedPacketType, SynchronousListener.DEFAULT_TIMEOUT);
+    public <R extends Packet> R sendAndReceive(Packet request,
+                                               Class<R> expectedPacketType)
+            throws IOException {
+
+        return sendAndReceive(
+                request,
+                expectedPacketType,
+                DEFAULT_TIMEOUT
+        );
     }
+
 
     /**
      * Filters to a given reply packet type.
      *
      * @see PacketConnection#sendAndReceive(Packet, Predicate, long)
      */
-    public <R extends Packet> R sendAndReceive(Packet request, Class<R> expectedPacketType, long timeout)
+    public <R extends Packet> R sendAndReceive(Packet request,
+                                               Class<R> expectedPacketType,
+                                               long timeout)
             throws IOException {
-        return (R) sendAndReceive(request, new TypeFilter<>(expectedPacketType), timeout);
+
+        return (R) sendAndReceive(
+                request,
+                getTypeFilter(expectedPacketType),
+                timeout
+        );
     }
+
+
+    public Packet sendAndReceive(Packet request,
+                                 long timeout)
+            throws IOException {
+
+        return sendAndReceive(request, p -> true, timeout);
+    }
+
 
     /**
      * Sends the packet and returns the expected reply if received.<br/>
@@ -124,7 +183,11 @@ public abstract class PacketConnection extends Connection {
      * @throws NoReplyException if no matching reply was received
      * @throws IOException      if an IO error occurs.
      */
-    public Packet sendAndReceive(Packet request, Predicate<Packet> filter, long timeout) throws IOException {
+    public Packet sendAndReceive(Packet request,
+                                 Predicate<Packet> filter,
+                                 long timeout)
+            throws IOException {
+
         SynchronousListener listener = new SynchronousListener(filter);
         addListener(listener);
         send(request);
@@ -136,28 +199,47 @@ public abstract class PacketConnection extends Connection {
         return reply;
     }
 
+
     /**
      * <code>timeout</code> preset with
      * {@link PacketConnection.SynchronousListener#DEFAULT_TIMEOUT}
      *
      * @see PacketConnection#sendAndReceive(Packet, Predicate, long)
      */
-    public <R extends Packet> R sendAndReceive(Packet request, Class<R> expectedPacketType, Predicate<R> filter)
+    public <R extends Packet> R sendAndReceive(Packet request,
+                                               Class<R> expectedPacketType,
+                                               Predicate<R> filter)
             throws IOException {
-        return sendAndReceive(request, expectedPacketType, filter, SynchronousListener.DEFAULT_TIMEOUT);
+
+        return sendAndReceive(
+                request,
+                expectedPacketType,
+                filter,
+                DEFAULT_TIMEOUT
+        );
     }
+
 
     /**
      * Combines expected packet type and additional filter.
      *
      * @see PacketConnection#sendAndReceive(Packet, Predicate, long)
      */
-    public <R extends Packet> R sendAndReceive(Packet request, Class<R> expectedPacketType, Predicate<R> filter,
-                                               long timeout) throws IOException {
-        Predicate<Packet> typeFilter = new TypeFilter<>(expectedPacketType);
-        Predicate<Packet> composed = p -> typeFilter.test(p) && filter.test((R) p);
-        return (R) sendAndReceive(request, composed, timeout);
+    public <R extends Packet> R sendAndReceive(Packet request,
+                                               Class<R> expectedPacketType,
+                                               Predicate<R> filter,
+                                               long timeout)
+            throws IOException {
+
+        Predicate<Packet> typeFilter = getTypeFilter(expectedPacketType);
+        Predicate<Packet> combined = p -> typeFilter.test(p) && filter.test((R) p);
+        return (R) sendAndReceive(
+                request,
+                combined,
+                timeout
+        );
     }
+
 
     /**
      * <code>timeout</code> preset with
@@ -165,18 +247,109 @@ public abstract class PacketConnection extends Connection {
      *
      * @see PacketConnection#sendAndReceive(Packet, Predicate, long)
      */
-    public Packet sendAndReceive(Packet request, Predicate<Packet> filter) throws IOException {
-        return sendAndReceive(request, filter, SynchronousListener.DEFAULT_TIMEOUT);
+    public Packet sendAndReceive(Packet request,
+                                 Predicate<Packet> filter)
+            throws IOException {
+
+        return sendAndReceive(
+                request,
+                filter,
+                DEFAULT_TIMEOUT
+        );
     }
 
-    /**
-     * Filters incoming packages to answers to the request.
-     *
-     * @see PacketConnection#sendAndReceive(Packet, Predicate, long)
-     */
-    public Packet sendAndReceiveAnswer(Packet request, long timeout) throws IOException {
-        return sendAndReceive(request, a -> a.getAnswerTo().equals(request.getID()), timeout);
+
+    public <R extends Packet> R sendAndReceiveAnswer(Packet request,
+                                                     Class<R> expectedPacketType,
+                                                     Predicate<R> filter,
+                                                     long timeout)
+            throws IOException {
+
+        Predicate<Packet> typeFilter = getTypeFilter(expectedPacketType);
+        Predicate<Packet> combined = p -> typeFilter.test(p) && filter.test((R) p);
+
+        return (R) sendAndReceiveAnswer(
+                request,
+                combined,
+                timeout
+        );
     }
+
+
+    public <R extends Packet> R sendAndReceiveAnswer(Packet request,
+                                                     Class<R> expectedPacketType,
+                                                     Predicate<R> filter)
+            throws IOException {
+
+        return sendAndReceiveAnswer(
+                request,
+                expectedPacketType,
+                filter,
+                DEFAULT_TIMEOUT
+        );
+    }
+
+
+    public <R extends Packet> R sendAndReceiveAnswer(Packet request,
+                                                     Class<R> expectedPacketType,
+                                                     long timeout)
+            throws IOException {
+
+        return (R) sendAndReceiveAnswer(
+                request,
+                getTypeFilter(expectedPacketType),
+                timeout
+        );
+    }
+
+
+    public <R extends Packet> R sendAndReceiveAnswer(Packet request,
+                                                     Class<R> expectedPacketType)
+            throws IOException {
+
+        return sendAndReceiveAnswer(
+                request,
+                expectedPacketType,
+                DEFAULT_TIMEOUT
+        );
+    }
+
+
+    public Packet sendAndReceiveAnswer(Packet request,
+                                       long timeout)
+            throws IOException {
+
+        return sendAndReceiveAnswer(
+                request,
+                p -> true,
+                timeout);
+    }
+
+
+    public Packet sendAndReceiveAnswer(Packet request,
+                                       Predicate<Packet> filter,
+                                       long timeout)
+            throws IOException {
+
+        return sendAndReceive(
+                request,
+                getAnswerFilter(request).and(filter),
+                timeout
+        );
+    }
+
+
+    public Packet sendAndReceiveAnswer(Packet request,
+                                       Predicate<Packet> filter)
+            throws IOException {
+
+        return sendAndReceiveAnswer(
+                request,
+                filter,
+                DEFAULT_TIMEOUT
+        );
+    }
+
 
     /**
      * The listener interface for receiving connection events on a {@link PacketConnection}.
@@ -188,7 +361,9 @@ public abstract class PacketConnection extends Connection {
          *
          * @param event the event, containing close reason and connection
          */
-        default void closed(CloseEvent event){}
+        default void closed(CloseEvent event) {
+
+        }
 
         /**
          * Invoked when the connection receives a packet.
@@ -213,6 +388,7 @@ public abstract class PacketConnection extends Connection {
 
         @Override
         default void packetReceived(PacketReceivedEvent event) {
+
             if (test(event))
                 filteredPacketReceived(event);
         }
@@ -230,28 +406,54 @@ public abstract class PacketConnection extends Connection {
      */
     public static abstract class PacketTypeListener<T> implements FilteredPacketListener {
 
-        private TypeFilter<Packet> typeFilter;
+        private Predicate<Packet> typeFilter;
+
 
         public PacketTypeListener() {
-            Class<?> ownType = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass())
+
+            Class<T> ownType = (Class<T>) ((ParameterizedType) this.getClass().getGenericSuperclass())
                     .getActualTypeArguments()[0];
-            typeFilter = new TypeFilter<>(ownType);
+            typeFilter = getTypeFilter(ownType);
         }
 
+
         public boolean additionalTest(T packet, PacketReceivedEvent event) {
+
             return true;
         }
 
+
         @Override
         public void filteredPacketReceived(PacketReceivedEvent event) {
+
             packetReceived((T) event.getPacket(), event);
         }
 
+
         public abstract void packetReceived(T packet, PacketReceivedEvent event);
+
 
         @Override
         public boolean test(PacketReceivedEvent event) {
+
             return typeFilter.test(event.getPacket()) && additionalTest((T) event.getPacket(), event);
+        }
+
+    }
+
+    public static abstract class AnswerListener<T> extends PacketTypeListener<T> {
+
+        public abstract Packet answer(T packet);
+
+
+        @Override
+        public void packetReceived(T packet, PacketReceivedEvent event) {
+
+            try {
+                event.sendAnswer(answer(packet));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -263,7 +465,6 @@ public abstract class PacketConnection extends Connection {
      */
     public class SynchronousListener implements Listener {
 
-        public static final int DEFAULT_TIMEOUT = 2000;
 
         /**
          * Used as wait lock for the synchronous reply.
@@ -272,13 +473,18 @@ public abstract class PacketConnection extends Connection {
         private Predicate<Packet> filter = null;
         private Packet replyPacket;
 
+
         public SynchronousListener(Predicate<Packet> filter) {
+
             this.filter = filter;
         }
 
+
         @Override
         public void closed(CloseEvent event) {
+
         }
+
 
         /**
          * Gets the reply received.
@@ -286,11 +492,14 @@ public abstract class PacketConnection extends Connection {
          * @return replyPacket
          */
         public Packet getReplyPacket() {
+
             return replyPacket;
         }
 
+
         @Override
         public void packetReceived(PacketReceivedEvent event) {
+
             if (!filter.test(event.getPacket()))
                 return;
 
@@ -305,14 +514,17 @@ public abstract class PacketConnection extends Connection {
             }
         }
 
+
         /**
          * <code>timeout = DEFAULT_TIMEOUT</code><br>
          *
          * @see SynchronousListener#waitForReply(long)
          */
         public boolean waitForReply() {
+
             return waitForReply(DEFAULT_TIMEOUT);
         }
+
 
         /**
          * Waits for a reply packet to arrive.
@@ -322,6 +534,7 @@ public abstract class PacketConnection extends Connection {
          * @return true, if a reply was received
          */
         public boolean waitForReply(long timeout) {
+
             if (replyPacket != null)
                 return true;
 

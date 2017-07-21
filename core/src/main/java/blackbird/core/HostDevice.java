@@ -2,6 +2,10 @@ package blackbird.core;
 
 import blackbird.core.util.ConstructionPlan;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 /**
  * A device running a blackbird instance like this.
  * <p>
@@ -10,6 +14,27 @@ import blackbird.core.util.ConstructionPlan;
 public class HostDevice extends Device {
 
     private static final long serialVersionUID = 2321322602384965052L;
+
+    private String id;
+
+    private List<DPort> ports;
+
+    public HostDevice() {
+        this.id = UUID.randomUUID().toString();
+
+        ports = new ArrayList<>();
+    }
+
+    public HostDevice(String id, String name) {
+        this();
+
+        this.id = id;
+        getUIProperties().setProperty("name", name);
+    }
+
+    public List<DPort> getPorts() {
+        return ports;
+    }
 
     /**
      * The host device interface offers basic blackbird functions to other devices.

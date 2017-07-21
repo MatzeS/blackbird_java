@@ -1,13 +1,13 @@
-package blackbird.core;
+package blackbird.core.managers;
+
+import blackbird.core.Blackbird;
+import blackbird.core.DInterface;
+import blackbird.core.Device;
 
 import java.util.Optional;
-import java.util.Stack;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import blackbird.core.exception.BFException;
-import blackbird.core.util.ConstructionPlan;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -19,41 +19,40 @@ public abstract class DeviceManager {
      */
     protected final Lock lock = new ReentrantLock();
     protected final Device device;
-    protected final Stack<DInterface> implementationStack;
-    protected BlackbirdImpl blackbird; //TODO by getter or chage at all
     protected DInterface remoteHandle;
 
-    public DeviceManager(BlackbirdImpl blackbird, Device device) {
+    protected Blackbird blackbird; //TODO by getter or chage at all
+
+
+    public DeviceManager(Blackbird blackbird, Device device) {
+
         this.blackbird = blackbird;
         checkNotNull(device);
 
         this.device = device;
-        implementationStack = new Stack<>();
     }
 
-    protected Object constructHandle(Class<?> type) {
-        ConstructionPlan plan = blackbird.constructHandle(new ConstructionPlan(device, type));
-
-        if (!plan.succeeded())
-            throw new BFException("could not implement");
-
-        return blackbird.interfaceHost(plan.getSucceeded()).interfaceDevice(device, type);
-    }
 
     protected abstract Object extendHandle(Class<?> type);
 
-    protected Device getDevice() {
+
+    public Device getDevice() {
+
         return device;
     }
 
+
     protected Optional<DInterface> getHandle() {
+
         if (getRemoteHandle().isPresent())
             return getRemoteHandle();
-        else
-            return getImplementation();
+
+        return Optional.empty();
     }
 
-    protected Object getHandle(Class<?> type) {
+
+    public Object getHandle(Class<?> type) {
+
         getLock().lock();
         try {
             if (isHandleSatisfying(type))
@@ -67,26 +66,22 @@ public abstract class DeviceManager {
         }
     }
 
-    protected Optional<DInterface> getImplementation() {
-        if (getImplementationStack().isEmpty())
-            return Optional.empty();
-        else
-            return Optional.of(getImplementationStack().peek());
-    }
 
-    protected Stack<DInterface> getImplementationStack() {
-        return this.implementationStack;
-    }
 
     protected Lock getLock() {
+
         return this.lock;
     }
 
+
     protected Optional<DInterface> getRemoteHandle() {
+
         return Optional.ofNullable(remoteHandle);
     }
 
+
     protected boolean isHandleExtensible(Class<?> type) {
+
         if (!getHandle().isPresent())
             return true;
 
@@ -95,29 +90,38 @@ public abstract class DeviceManager {
                 .isPresent();
     }
 
+
     protected boolean isHandleSatisfying(Class<?> type) {
+
         return getHandle()
                 .filter(i -> type.isAssignableFrom(i.getClass()))
                 .isPresent();
     }
 
-    protected boolean isLocallyImplemented() {
-        return getImplementation().isPresent();
-    }
+
+
+
 
     protected void lock() {
+
         getLock().lock();
     }
 
+
     protected boolean tryLock() {
+
         return getLock().tryLock();
     }
 
+
     protected boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
+
         return getLock().tryLock(time, unit);
     }
 
+
     protected void unlock() {
+
         getLock().unlock();
     }
 

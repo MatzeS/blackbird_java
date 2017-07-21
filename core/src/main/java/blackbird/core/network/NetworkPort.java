@@ -1,17 +1,18 @@
 package blackbird.core.network;
 
+import blackbird.core.DPort;
+import blackbird.core.util.Hex;
+
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import blackbird.core.util.Hex;
-
 /**
- * A port consumed by the NetworkConnector storing MAC and IP addresses.
+ * Storing MAC and possible according IP addresses with port.
  */
-public class NetworkPort {
+public class NetworkPort extends DPort {
 
     private static final long serialVersionUID = 5388626648137321057L;
 
@@ -32,13 +33,16 @@ public class NetworkPort {
         this.socketAddresses = Arrays.stream(socketAddresses).collect(Collectors.toList());
     }
 
-
     public byte[] getMacAddress() {
         return macAddress;
     }
 
     public List<InetSocketAddress> getSocketAddresses() {
         return socketAddresses;
+    }
+
+    public void addSocketAddress(InetSocketAddress address) {
+        socketAddresses.add(address);
     }
 
 }

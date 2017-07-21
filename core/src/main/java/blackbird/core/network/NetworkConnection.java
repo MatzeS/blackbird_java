@@ -1,14 +1,14 @@
 package blackbird.core.network;
 
+import blackbird.core.connection.Connection;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import blackbird.core.connection.Connection;
-
 /**
- * Connection implementation for communication via network sockets.
+ * Connection implementation for communication via TCP/IP sockets.
  */
 public class NetworkConnection extends Connection {
 
@@ -25,6 +25,10 @@ public class NetworkConnection extends Connection {
             throw new IOException("NetworkConnection expects a not closed, bound and connected socket");
 
         this.socket = socket;
+    }
+
+    public static String getSocketText(Socket socket) {
+        return socket.getRemoteSocketAddress().toString().substring(1);
     }
 
     @Override
@@ -53,10 +57,6 @@ public class NetworkConnection extends Connection {
     @Override
     public String toString() {
         return "NETCON_" + hashCode() + "[" + getSocketRemoteAddress() + "]";
-    }
-
-    public static String getSocketText(Socket socket) {
-        return socket.getRemoteSocketAddress().toString().substring(1);
     }
 
 }

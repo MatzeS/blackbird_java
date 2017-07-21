@@ -52,6 +52,10 @@ public class RCSocketImplementation extends RCSocket.Implementation {
             return new RCSocketImplementation(endpointImpl);
         }
 
+        @Override
+        public AVRDevice getSingleEndpoint(RCSocket device) {
+            return device.getTransmitter();
+        }
     }
 
 }

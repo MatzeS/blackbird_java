@@ -1,6 +1,7 @@
 package blackbird.core;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +19,11 @@ public class Cluster {
      * Stored DIStates from destroyed implementations.
      */
     private Map<Device, DIState> deviceImplementationStates;
+
+    public Cluster() {
+        domains = new HashMap<>();
+        devices = new HashMap<>();
+    }
 
     public Collection<Device> getDevices() {
         return devices.values();

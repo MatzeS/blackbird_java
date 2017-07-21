@@ -37,7 +37,7 @@ public abstract class GenericBuilder<D extends Device, I> extends DIBuilder {
         return (DImplementation) buildGeneric((D) device);
     }
 
-    public abstract I buildGeneric(D device) throws BFException;
+    public abstract I buildGeneric(D device);
 
     @Override
     public boolean canBuild(Device device) {

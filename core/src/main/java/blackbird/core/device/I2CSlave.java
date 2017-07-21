@@ -1,13 +1,13 @@
 package blackbird.core.device;
 
-import java.io.IOException;
-import java.util.Objects;
-
 import blackbird.core.DImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
 import blackbird.core.builders.EndpointBuilder;
 import blackbird.core.cluster.I2CBus;
+
+import java.io.IOException;
+import java.util.Objects;
 
 import static blackbird.core.avr.ByteHelper.setBit;
 
@@ -24,6 +24,16 @@ public class I2CSlave extends Device {
     private I2CBus bus;
 
     public I2CSlave() {
+    }
+
+    public static void updateRegisterBit(I2CSlave.Implementation impl, byte register, int bit, boolean value) throws IOException {
+        byte registerValue = impl.readRegister(register);
+        registerValue = setBit(registerValue, bit, value);
+        impl.writeRegister(register, registerValue);
+    }
+
+    public void setBus(I2CBus bus) {
+        this.bus = bus;
     }
 
     @Override
@@ -52,15 +62,8 @@ public class I2CSlave extends Device {
         return Objects.hash(super.hashCode(), i2cAddress);
     }
 
-
     public void setI2CAddress(int slaveAddress, int fixedAddress) {
         setI2CAddress(slaveAddress | fixedAddress);
-    }
-
-    public static void updateRegisterBit(I2CSlave.Implementation impl, byte register, int bit, boolean value) throws IOException {
-        byte registerValue = impl.readRegister(register);
-        registerValue = setBit(registerValue, bit, value);
-        impl.writeRegister(register, registerValue);
     }
 
 

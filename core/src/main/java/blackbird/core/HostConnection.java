@@ -1,21 +1,14 @@
 package blackbird.core;
 
-import com.thoughtworks.xstream.XStream;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.io.EOFException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InvalidClassException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamClass;
-
 import blackbird.core.connection.CloseReason;
 import blackbird.core.connection.Connection;
 import blackbird.core.connection.Packet;
 import blackbird.core.connection.PacketConnection;
+import com.thoughtworks.xstream.XStream;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.*;
 
 /**
  * The class provides the general connection implementation for {@link HostDevice}s
@@ -32,6 +25,8 @@ public class HostConnection extends PacketConnection implements Runnable {
     private ObjectOutputStream objectOutputStream;
     private DecompressibleInputStream objectInputStream;
 
+    private HostDevice host;
+
     public HostConnection(Connection componentConnection) throws IOException {
         super(componentConnection); // delegate
 
@@ -44,6 +39,14 @@ public class HostConnection extends PacketConnection implements Runnable {
         receiveThread.start();
     }
 
+    public HostDevice getHost() {
+
+        return host;
+    }
+
+    public void setHost(HostDevice host) {
+        this.host = host;
+    }
 
     @Override
     public void close() throws IOException {

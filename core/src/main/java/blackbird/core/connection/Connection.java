@@ -7,6 +7,8 @@ import java.io.OutputStream;
 /**
  * This class defines the most basic connection,
  * only providing an input/output stream and a close state.
+ *
+ * TODO common lock
  */
 public abstract class Connection {
 

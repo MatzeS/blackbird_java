@@ -1,11 +1,11 @@
 package blackbird.core.builders;
 
-import java.util.Collections;
-import java.util.List;
-
 import blackbird.core.Device;
 import blackbird.core.exception.BFException;
 import blackbird.core.util.Generics;
+
+import java.util.Collections;
+import java.util.List;
 
 public abstract class EndpointBuilder<
         D extends Device,
@@ -30,7 +30,11 @@ public abstract class EndpointBuilder<
     public I buildGeneric(D device) throws BFException {
         for (E endpoint : getEndpoints(device))
             try {
+                System.out.println("endpoint: " + endpoint);
+
                 EI endpointImpl = implement(endpoint, endpointInterfaceType);
+
+                System.out.println("endpoint build" + endpoint);
 
                 return buildFromEndpoint(device, endpoint, endpointImpl);
             } catch (Exception ignored) {
@@ -56,7 +60,7 @@ public abstract class EndpointBuilder<
 
 
     public E getSingleEndpoint(D device) {
-        throw new UnsupportedOperationException("Not implemented");
+        throw new UnsupportedOperationException("Not implemented" + this.getClass());
     }
 
 }

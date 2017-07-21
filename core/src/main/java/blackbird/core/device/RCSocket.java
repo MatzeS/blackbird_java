@@ -1,8 +1,8 @@
 package blackbird.core.device;
 
-import java.util.Objects;
-
 import blackbird.core.device.avr.AVRDevice;
+
+import java.util.Objects;
 
 /**
  * The RCSocket class is used to identify popular low cost
@@ -20,6 +20,10 @@ public class RCSocket extends RemoteSocket {
     private int address;
     private AVRDevice transmitter;
 
+    public void setTransmitter(AVRDevice transmitter) {
+        this.transmitter = transmitter;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -31,15 +35,6 @@ public class RCSocket extends RemoteSocket {
 
     public int getAddress() {
         return address;
-    }
-
-    public void setAddress(int address) {
-        this.address = address;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), address);
     }
 
     public void setAddress(String address) {
@@ -54,4 +49,16 @@ public class RCSocket extends RemoteSocket {
             this.address |= address.charAt(9 - i) == '1' ? (1 << i) : 0;
     }
 
+    public void setAddress(int address) {
+        this.address = address;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), address);
+    }
+
+    public AVRDevice getTransmitter() {
+        return transmitter;
+    }
 }

@@ -1,5 +1,10 @@
 package blackbird.core.network;
 
+import blackbird.core.GenericConnector;
+import blackbird.core.HostDevice;
+import blackbird.core.connection.Connection;
+import blackbird.core.connection.exceptions.NoConnectionException;
+import blackbird.core.util.MultiException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -11,16 +16,9 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
-import blackbird.core.GenericConnector;
-import blackbird.core.HostDevice;
-import blackbird.core.exception.ImplementationFailedException;
-import blackbird.core.connection.exceptions.NoConnectionException;
-import blackbird.core.util.MultiException;
-
 /**
- * A connector using the default java network communication through {@link Socket}s.
- * <p>
- * The connector creates a {@link ServerSocket} for incoming connections.
+ * Consumes {@link NetworkPort}s to establish TCP/IP sockets.
+ * Server is setup on port 1337 / DEFAULT_NETWORK_PORT.
  */
 public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> {
 
@@ -29,27 +27,27 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
 
     private Logger logger = LogManager.getLogger(NetworkConnector.class);
 
-    /**
-     * The local network server instance accepting external connects.
-     *
-     * @see Server
-     */
     private Server server;
 
     /**
-     * Creates the connector and starts the server on port 1337;
-     */
-    public NetworkConnector() throws IOException {
-        this(DEFAULT_NETWORK_PORT);
-    }
-
-    /**
-     * Creates the connector and starts the server on the given port
+     * uses DEFAULT_NETWORK_PORT
      *
      * @param serverPort the server socket port
+     * @see NetworkConnector#NetworkConnector(int)
+     * /
+     * public NetworkConnector() throws IOException {
+     * this(DEFAULT_NETWORK_PORT);
+     * }
+     * <p>
+     * /**
+     * Creates the connector and starts the server on the given port
      */
     public NetworkConnector(int serverPort) throws IOException {
         startServer(serverPort);
+    }
+
+    public Server getServer() {
+        return server;
     }
 
     /**
@@ -57,41 +55,45 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
      *
      * @param socketAddress the socket address to connect to
      * @return the connected connection
-     * @throws NoConnectionException if the connect fails
      * @see NetworkConnector#connect(InetSocketAddress, int)
      */
-    public NetworkConnection connect(InetSocketAddress socketAddress) throws NoConnectionException {
+    public NetworkConnection connect(InetSocketAddress socketAddress) {
         return connect(socketAddress, DEFAULT_TIMEOUT);
     }
 
     /**
-     * Connecting to the given address with a <code>Socket</code>.
+     * Connects to the given address
      *
      * @param socketAddress the socket address to connect to
      * @param timeout       the connection timeout for the socket
      * @return the connected connection
-     * @throws NoConnectionException if the socket connect fails
      */
-    public NetworkConnection connect(InetSocketAddress socketAddress, int timeout) throws NoConnectionException {
+    public NetworkConnection connect(InetSocketAddress socketAddress, int timeout) {
         try {
             Socket socket = new Socket();
             socket.connect(socketAddress, timeout);
             return connect(socket);
         } catch (IOException e) {
-            throw new NoConnectionException("could not connect", e);
+            throw new NoConnectionException("IOException during TCP connect", e);
         }
     }
 
-    public NetworkConnection connect(Socket socket) throws IOException {
+    private NetworkConnection connect(Socket socket) throws IOException {
         return new NetworkConnection(socket);
     }
 
-    public NetworkConnection connect(String host) throws NoConnectionException {
+    /**
+     * Connects to an address using the DEFAULT_NETWORK_PORT
+     *
+     * @param host IP address
+     * @return connection targeting the given address
+     */
+    public NetworkConnection connect(String host) {
         return connect(new InetSocketAddress(host, DEFAULT_NETWORK_PORT));
     }
 
     @Override
-    public NetworkConnection connect(HostDevice device, NetworkPort port) throws NoConnectionException {
+    public Connection connectToPort(HostDevice device, NetworkPort port) {
         List<NoConnectionException> failures = new ArrayList<>();
 
         for (InetSocketAddress address : port.getSocketAddresses())
@@ -101,12 +103,11 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
                 failures.add(e);
             }
 
-        String text = MultiException.generateMultipleExceptionText(failures);
-        throw new NoConnectionException("not able to connect to any known socket address\n" + text);
+        throw new NoConnectionException("could not connect to any socket address\n" +
+                MultiException.generateMultipleExceptionText(failures));
     }
 
     private void startServer(int port) throws IOException {
-        // start network server
         try {
             server = new Server(port);
         } catch (IOException e) {
@@ -115,9 +116,10 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
         }
     }
 
+
     /**
-     * The class implements a local network server accepting connections to the port running on
-     * allowing external devices to connect with the local blackbird instance.
+     * Sets up a local TCP/IP network server socket
+     * allowing external devices to connect to the local host/blackbird.
      */
     public class Server extends ServerSocket implements Runnable {
 
@@ -151,16 +153,16 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
             while (isBound() && !isClosed()) {
                 try {
                     Socket socket = accept();
-                    logger.info("accepting connection from " + NetworkConnection.getSocketText(socket));
-                    NetworkConnection networkConnection = connect(socket);
+                    logger.info("accepting connection from " +
+                            NetworkConnection.getSocketText(socket));
 
-                    blackbird.getHostDeviceImplementationBuilder().setupConnection(networkConnection);
+                    NetworkConnection networkConnection = connect(socket);
+                    acceptConnection(networkConnection);
+
                 } catch (SocketException e) {
-                    // caused by intentional close
+                    // caused by intentional close //TODO
                 } catch (IOException e) {
                     logger.error("I/O exception on network server while accepting connection", e);
-                } catch (ImplementationFailedException e) {
-                    logger.error("Implementation failed on accepted network connection", e);
                 }
             }
         }

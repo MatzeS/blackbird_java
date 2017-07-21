@@ -30,7 +30,7 @@ public abstract class DIBuilder {
     }
 
     public boolean produces(Class<?> type) {
-        return produces().isAssignableFrom(type);
+        return type.isAssignableFrom(produces());
     }
 
     public void setImplementationReference(ImplementationReference implementationReference) {

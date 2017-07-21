@@ -3,18 +3,22 @@ package blackbird.core;
 import blackbird.core.connection.Connection;
 import blackbird.core.connection.exceptions.NoConnectionException;
 import blackbird.core.util.Generics;
+import blackbird.core.util.MultiException;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * The class reduces the accepted connect parameters to generically defined types.
+ * Reduces the accepted device and port to generically defined types.
  * <p>
- * The <code>check...</code> methods can be overwritten for more complex analysis and exclusion.
+ * The <code>check...</code> methods can be overwritten pre-checks and exclusion.
  * <p>
- * Notice: Expect device and port as wide as possible.
+ * Notice: Except device and port as wide as possible.
  *
  * @param <D> the accepted device
  * @param <P> the accepted port
  */
-public abstract class GenericConnector<D extends HostDevice, P extends DPort> implements Connector {
+public abstract class GenericConnector<D extends HostDevice, P extends DPort> extends Connector {
 
     private Class<D> deviceType;
     private Class<P> portType;
@@ -24,25 +28,37 @@ public abstract class GenericConnector<D extends HostDevice, P extends DPort> im
         portType = (Class<P>) Generics.getGenericArgument(this, 1);
     }
 
-    public void checkDevice(D device) throws NoConnectionException {
+    public void checkDevice(D device) {
     }
 
-    public void checkPort(P port) throws NoConnectionException {
+    public void checkPort(P port) {
     }
 
-    public abstract Connection connect(D device, P port) throws NoConnectionException;
+    public abstract Connection connectToPort(D device, P port);
 
-    public Connection connectTo(HostDevice device) throws NoConnectionException {
+    @Override
+    public Connection connect(HostDevice device) throws NoConnectionException {
         if (!deviceType.isAssignableFrom(device.getClass()))
             throw new NoConnectionException("Connector expects a " + deviceType);
 
-        if (!portType.isAssignableFrom(port.getClass()))
-            throw new NoConnectionException("Connector expects a " + portType);
-
         checkDevice((D) device);
-        checkPort((P) port);
 
-        return connect((D) device, (P) port);
+
+        List<Exception> exceptionList = new ArrayList<>();
+
+        for (DPort port : device.getPorts())
+            if (portType.isAssignableFrom(device.getPorts().getClass())) {
+                checkPort((P) port);
+
+                try {
+                    return connectToPort((D) device, (P) port);
+                } catch (Exception e) {
+                    exceptionList.add(e);
+                }
+            }
+
+        throw new NoConnectionException("no port succeeded: \n" +
+                MultiException.generateMultipleExceptionText(exceptionList));
     }
 
 }

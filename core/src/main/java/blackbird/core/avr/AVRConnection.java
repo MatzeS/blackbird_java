@@ -1,5 +1,12 @@
 package blackbird.core.avr;
 
+import blackbird.core.avr.DS18B20.DS18B20Parser;
+import blackbird.core.avr.i2c.I2CParser;
+import blackbird.core.avr.packets.TransmittableAVRPacket;
+import blackbird.core.avr.parsers.*;
+import blackbird.core.connection.Connection;
+import blackbird.core.connection.Packet;
+import blackbird.core.connection.PacketConnection;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -8,20 +15,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.function.Predicate;
-
-import blackbird.core.connection.Connection;
-import blackbird.core.connection.Packet;
-import blackbird.core.connection.PacketConnection;
-import blackbird.core.avr.DS18B20.DS18B20Parser;
-import blackbird.core.avr.i2c.I2CParser;
-import blackbird.core.avr.packets.TransmittableAVRPacket;
-import blackbird.core.avr.parsers.BasicPinParser;
-import blackbird.core.avr.parsers.CapSensePinParser;
-import blackbird.core.avr.parsers.CommonInterruptParser;
-import blackbird.core.avr.parsers.DeviceIdentificationParser;
-import blackbird.core.avr.parsers.IRParser;
-import blackbird.core.avr.parsers.PacketParser;
-import blackbird.core.avr.parsers.RCReceiveParser;
 
 public abstract class AVRConnection extends PacketConnection {
 
@@ -37,6 +30,7 @@ public abstract class AVRConnection extends PacketConnection {
 
 
     public AVRConnection(Connection connection) throws IOException {
+
         super(connection);
 
         packetParsers = new HashMap<>();
@@ -54,10 +48,13 @@ public abstract class AVRConnection extends PacketConnection {
 
 
     public void addPacketParser(PacketParser packetParser) {
+
         packetParsers.put(packetParser.getCommandByte(), packetParser);
     }
 
+
     public void consumeInputStream() {
+
         try {
             InputStream inputStream = getInputStream();
 
@@ -77,10 +74,13 @@ public abstract class AVRConnection extends PacketConnection {
         }
     }
 
+
     @Override
     protected void firePacketReceived(Packet packet) {
+
         super.firePacketReceived(packet);
     }
+
 
     private void parse(byte incomingByte) {
 
@@ -168,17 +168,22 @@ public abstract class AVRConnection extends PacketConnection {
 
     }
 
+
     public void removePacketParser(PacketParser packetParser) {
+
         packetParsers.remove(packetParser.getCommandByte());
     }
 
+
     @Override
     public void send(Packet packet) throws IOException {
+
         if (packet instanceof TransmittableAVRPacket)
             send((TransmittableAVRPacket) packet);
         else
             throw new UnsupportedOperationException("a avr connection can only send TransmittableAVRPacket's");
     }
+
 
     public synchronized void send(TransmittableAVRPacket packet) throws IOException {
 
@@ -259,40 +264,58 @@ public abstract class AVRConnection extends PacketConnection {
 
     }
 
+
     @Override
     public synchronized <R extends Packet> R sendAndReceive(Packet request, Class<R> expectedPacketType) throws IOException {
+
         return super.sendAndReceive(request, expectedPacketType);
     }
 
+
     @Override
     public synchronized <R extends Packet> R sendAndReceive(Packet request, Class<R> expectedPacketType, long timeout) throws IOException {
+
         return super.sendAndReceive(request, expectedPacketType, timeout);
     }
 
+
     @Override
     public synchronized Packet sendAndReceive(Packet request, Predicate<Packet> filter, long timeout) throws IOException {
+
         return super.sendAndReceive(request, filter, timeout);
     }
 
+
     @Override
     public synchronized <R extends Packet> R sendAndReceive(Packet request, Class<R> expectedPacketType, Predicate<R> filter) throws IOException {
+
         return super.sendAndReceive(request, expectedPacketType, filter);
     }
 
+
     @Override
     public synchronized <R extends Packet> R sendAndReceive(Packet request, Class<R> expectedPacketType, Predicate<R> filter, long timeout) throws IOException {
+
         return super.sendAndReceive(request, expectedPacketType, filter, timeout);
     }
 
+
     @Override
     public synchronized Packet sendAndReceive(Packet request, Predicate<Packet> filter) throws IOException {
+
         return super.sendAndReceive(request, filter);
     }
 
+
     @Override
-    public synchronized Packet sendAndReceiveAnswer(Packet request, long timeout) throws IOException {
+    public synchronized Packet sendAndReceiveAnswer(
+            Packet request,
+            Predicate<Packet> filter,
+            long timeout) throws IOException {
+
         throw new UnsupportedOperationException("avr's have no answer mechanic");
     }
+
 
     enum Expect {
         NOTHING, CMD, DATA, ESC

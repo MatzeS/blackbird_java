@@ -1,12 +1,13 @@
 package blackbird.core;
 
 /**
- * The basic implementation for a {@link Device}.
+ * The basic implementation for any device.
  * <p>
- * Primarily created by its {@link Builder} and from there commonly inserted into a {@link ComponentImplementation}.
- * <p>
- * Device implementations are encouraged to extend the {@link ComponentImplementation} class and use the
- * {@link ComponentDIBuilder} to insert the component implementation. The composite pattern reduces a bit of boiler plate
+ * Device implementations are encouraged to extend the
+ *
+ * TODO builder and setter methods, no builder needs to prudce a dimplementation
+ *
+ * The composite pattern reduces a bit of boiler plate
  * and allows a more flexible device implementation construction.
  *
  * @see DInterface
@@ -25,7 +26,7 @@ public class DImplementation implements DInterface {
         return device;
     }
 
-    protected void setDevice(Device device) {
+    public void setDevice(Device device) {
         this.device = device;
     }
 
@@ -34,7 +35,7 @@ public class DImplementation implements DInterface {
         return host;
     }
 
-    protected void setHost(HostDevice host) {
+    public void setHost(HostDevice host) {
         this.host = host;
     }
 

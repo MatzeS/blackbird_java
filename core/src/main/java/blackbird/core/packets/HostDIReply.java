@@ -1,31 +1,36 @@
 package blackbird.core.packets;
 
-import java.util.UUID;
-
 import blackbird.core.connection.Packet;
 
+/**
+ * @see HostDIRequest
+ */
 public class HostDIReply extends Packet {
 
     private int implID;
     private Exception exception;
 
-    public HostDIReply(UUID answerTo, Exception exception) {
 
-        super(answerTo);
+    public HostDIReply(Exception exception) {
+
         this.exception = exception;
     }
 
-    public HostDIReply(UUID answerTo, int implID) {
 
-        super(answerTo);
+    public HostDIReply(int implID) {
+
         this.implID = implID;
     }
 
+
     public Exception getException() {
+
         return exception;
     }
 
+
     public int getImplID() {
+
         return implID;
     }
 

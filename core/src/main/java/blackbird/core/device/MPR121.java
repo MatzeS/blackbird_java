@@ -1,8 +1,5 @@
 package blackbird.core.device;
 
-import java.io.IOException;
-import java.io.Serializable;
-
 import blackbird.core.Blackbird;
 import blackbird.core.DImplementation;
 import blackbird.core.avr.ByteHelper;
@@ -12,6 +9,9 @@ import blackbird.core.interconnect.Trigger;
 import blackbird.core.rmi.Remote;
 import blackbird.core.util.ListenerList;
 
+import java.io.IOException;
+import java.io.Serializable;
+
 public class MPR121 extends I2CSlave {
 
     public static final int ADDRESS_GND = 0x5A;
@@ -20,10 +20,6 @@ public class MPR121 extends I2CSlave {
     public static final int ADDRESS_SCL = 0x5D;
 
     public static final int PROXIMITY_ELECTRODE = 12;
-
-    public Trigger getTrigger(Blackbird blackbird, int electrode, Transition transition) {
-        return getTrigger(blackbird, this, electrode, transition);
-    }
 
     public static Trigger getTrigger(Blackbird blackbird, MPR121 mpr, int electrode, Transition transition) {
         MPR121.Interface mprInterface = blackbird.interfaceDevice(mpr, MPR121.Interface.class);
@@ -44,6 +40,10 @@ public class MPR121 extends I2CSlave {
         };
         mprInterface.addListener(listener);
         return () -> mprInterface.removeListener(listener);
+    }
+
+    public Trigger getTrigger(Blackbird blackbird, int electrode, Transition transition) {
+        return getTrigger(blackbird, this, electrode, transition);
     }
 
     @SuppressWarnings({"SpellCheckingInspection", "unused"})
@@ -248,12 +248,12 @@ public class MPR121 extends I2CSlave {
     public enum Transition {
         TOUCHED, RELEASED, BOTH;
 
-        public boolean matches(Transition transition) {
-            return this == BOTH || transition == BOTH || this == transition;
-        }
-
         public static Transition get(boolean touched) {
             return touched ? TOUCHED : RELEASED;
+        }
+
+        public boolean matches(Transition transition) {
+            return this == BOTH || transition == BOTH || this == transition;
         }
 
     }
@@ -281,7 +281,7 @@ public class MPR121 extends I2CSlave {
         @Override
         public Implementation buildGeneric(MPR121 device) throws BFException {
             I2CSlave.Interface slave = implement(device, I2CSlave.Interface.class);
-            I2CMaster.Interface master = implement(device, I2CMaster.Interface.class);
+            I2CMaster.Interface master = implement(device.getMaster(), I2CMaster.Interface.class);
             try {
                 return new Implementation(slave, master);
             } catch (IOException e) {
