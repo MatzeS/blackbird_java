@@ -1,11 +1,5 @@
 package blackbird.core.device;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
-
 import blackbird.core.Blackbird;
 import blackbird.core.DImplementation;
 import blackbird.core.DInterface;
@@ -13,6 +7,12 @@ import blackbird.core.Device;
 import blackbird.core.builders.GenericBuilder;
 import blackbird.core.exception.BFException;
 import blackbird.core.util.ListenerList;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Predicate;
 
 
 public class AppleRemote extends Device {
@@ -54,6 +54,19 @@ public class AppleRemote extends Device {
         impl.addListener(listener);
         return () -> impl.removeListener(listener);
     }
+
+
+    public void setRemoteID(byte remoteID) {
+
+        this.remoteID = remoteID;
+    }
+
+
+    public void setPort(Port port) {
+
+        this.port = port;
+    }
+
 
     public enum Key {
 

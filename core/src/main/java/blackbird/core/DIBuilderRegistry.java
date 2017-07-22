@@ -18,7 +18,9 @@ public class DIBuilderRegistry {
     private static DIBuilderRegistry ourInstance = new DIBuilderRegistry();
     private List<DIBuilder> builderList;
 
+
     private DIBuilderRegistry() {
+
         builderList = new ArrayList<>();
 
 //        builderList.add(new InfraredReceiverImplementation.Builder());
@@ -38,24 +40,33 @@ public class DIBuilderRegistry {
         builderList.add(new blackbird.core.device.MPR121.Builder());
         builderList.add(new blackbird.core.device.avr.AVRI2CMasterModuleImplementation.Builder());
         builderList.add(new blackbird.core.device.I2CSlave.Builder());
+        builderList.add(new blackbird.core.device.avr.IRModule.Builder());
 
 
 //        builderList.add(new LocalHostDeviceImplementation.Builder());
     }
 
+
     public static void addBuilder(DIBuilder builder) {
+
         getInstance().builderList.add(builder);
     }
 
+
     public static List<DIBuilder> getBuilders() {
+
         return getInstance().builderList;
     }
 
+
     public static DIBuilderRegistry getInstance() {
+
         return ourInstance;
     }
 
+
     public static void removeBuilder(DIBuilder builder) {
+
         getInstance().builderList.remove(builder);
     }
 
