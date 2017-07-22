@@ -2,9 +2,9 @@ package blackbird.core.managers;
 
 import blackbird.core.*;
 import blackbird.core.builders.DIBuilder;
-import blackbird.core.exception.BFException;
 import blackbird.core.exception.OtherHostException;
 import blackbird.core.util.ConstructionPlan;
+import blackbird.core.util.MultiRuntimeException;
 import com.google.common.base.Objects;
 
 import java.util.*;
@@ -72,12 +72,17 @@ public abstract class ConstructingManager extends DeviceManager {
             plan.setSucceeded(blackbird.getLocalDevice());
 
             return plan;
-        } catch (OtherHostException e) {
-            otherHosts.add(e.getHost());
+        } catch (MultiRuntimeException e) {
+            e.getExceptions().stream()
+                    .filter(ex -> (ex instanceof OtherHostException))
+                    .map(ex -> (OtherHostException) ex)
+                    .map(ex -> ex.getHosts())
+                    .forEach(otherHosts::addAll);
         }
 
         plan.addFailed(blackbird.getLocalDevice());
         plan.addPossibleHosts(otherHosts);
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + otherHosts.size());
 
         if (plan.getPossible().isEmpty())
             return plan;
@@ -96,6 +101,8 @@ public abstract class ConstructingManager extends DeviceManager {
 
     public DImplementation build(Class<?> type) {
 
+        List<Exception> exceptionList = new ArrayList<>();
+
 //        logger.info(device + " BUILD");
         for (DIBuilder builder : blackbird.getBuilders())
             if (!args.contains(new Args(device, type, builder)))
@@ -109,6 +116,13 @@ public abstract class ConstructingManager extends DeviceManager {
 
                                 System.out.println("implementing: " + device + "/" + type);
                                 return blackbird.interfaceDevice(device, type);
+                            }
+
+
+                            @Override
+                            public HostDevice getLocalDevice() {
+
+                                return blackbird.getLocalDevice();
                             }
                         });
 
@@ -131,16 +145,18 @@ public abstract class ConstructingManager extends DeviceManager {
 
                         return impl;
 
-                    } catch (Exception ignored) {
+                    } catch (Exception e) {
                         System.err.print(builder + " failed on " + device + " \n \n");
-                        ignored.printStackTrace();
+//                        ignored.printStackTrace();
                         System.err.print(" \n \n");
+
+                        exceptionList.add(e);
                     }
 
                 } //else
         //System.out.println(builder + ":" + builder.canBuild(device) + "/" + builder.produces(plan.getType()));
 
-        throw new BFException("could not build");
+        throw new MultiRuntimeException(exceptionList);
     }
 
 

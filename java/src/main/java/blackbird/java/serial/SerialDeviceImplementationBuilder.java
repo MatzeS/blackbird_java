@@ -9,17 +9,17 @@ import blackbird.core.device.SerialDevice;
 import blackbird.core.device.SerialDevice.Implementation;
 import blackbird.core.device.SerialDevice.Port;
 import blackbird.core.exception.BFException;
+import blackbird.core.exception.OtherHostException;
 
 public class SerialDeviceImplementationBuilder
         extends GenericBuilder<SerialDevice, Implementation> {
 
     @Override
-    public Implementation buildGeneric(SerialDevice device) throws BFException {
+    public Implementation buildGeneric(SerialDevice device) {
         Port port = device.getPort();
 
-//        if (!getLocalDevice().equals(port.getHost()))
-//            throw new BFException("serail device is not attached to this device");
-//TODO
+        if (!getLocalDevice().equals(port.getHost()))
+            throw new OtherHostException(port.getHost());
 
         try {
 

@@ -18,22 +18,34 @@ public class HostDeviceImplementation
 
     private Blackbird blackbird;
 
+
     public HostDeviceImplementation(Blackbird blackbird) {
+
         this.blackbird = blackbird;
     }
 
+
     @Override
     public ConstructionPlan constructHandle(ConstructionPlan plan) {
+
+        System.out.println("construct handle" + plan.getDevice());
+
         return blackbird.constructHandle(plan);
     }
 
+
     @Override
     public Object interfaceDevice(Device device, Class<?> type) {
+
         return blackbird.interfaceDevice(device, type);
     }
 
+
     @Override
     public boolean isDeviceLocallyImplemented(Device device) {
+
+        System.out.println("blackbird.isLocallyImplemented(device):" + device + "/"
+                + blackbird.isLocallyImplemented(device));
         return blackbird.isLocallyImplemented(device);
     }
 

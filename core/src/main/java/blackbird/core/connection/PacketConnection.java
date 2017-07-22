@@ -74,7 +74,6 @@ public abstract class PacketConnection extends Connection {
 
     protected void firePacketReceived(Packet packet) {
 
-        System.out.println("received " + packet.getClass().getSimpleName() + "/" + packet.hashCode());
         logger.trace("received " + packet.getClass().getSimpleName() + "/" + packet.hashCode());
         PacketReceivedEvent e = new PacketReceivedEvent(PacketConnection.this, packet);
         listeners.fire(l -> l.packetReceived(e));

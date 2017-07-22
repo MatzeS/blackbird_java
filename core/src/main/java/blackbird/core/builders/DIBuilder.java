@@ -3,6 +3,7 @@ package blackbird.core.builders;
 import blackbird.core.DImplementation;
 import blackbird.core.DInterface;
 import blackbird.core.Device;
+import blackbird.core.HostDevice;
 
 /**
  * DIBuilders are used by blackbird to create implementations for devices.
@@ -39,6 +40,11 @@ public abstract class DIBuilder {
 
     public interface ImplementationReference {
         <T> T implement(Device device, Class<T> type);
+        HostDevice getLocalDevice();
+    }
+
+    public HostDevice getLocalDevice(){
+        return implementationReference.getLocalDevice();
     }
 
 }
