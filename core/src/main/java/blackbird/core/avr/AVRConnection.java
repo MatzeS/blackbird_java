@@ -280,9 +280,9 @@ public abstract class AVRConnection extends PacketConnection {
 
 
     @Override
-    public synchronized Packet sendAndReceive(Packet request, Predicate<Packet> filter, long timeout) throws IOException {
+    public synchronized Packet sendAndReceive(Packet request, int retries, Predicate<Packet> filter, long timeout) throws IOException {
 
-        return super.sendAndReceive(request, filter, timeout);
+        return super.sendAndReceive(request, retries, filter, timeout);
     }
 
 
@@ -310,10 +310,11 @@ public abstract class AVRConnection extends PacketConnection {
     @Override
     public synchronized Packet sendAndReceiveAnswer(
             Packet request,
+            int retries,
             Predicate<Packet> filter,
             long timeout) throws IOException {
 
-        throw new UnsupportedOperationException("avr's have no answer mechanic");
+        throw new UnsupportedOperationException("AVRs have no answer mechanic");
     }
 
 

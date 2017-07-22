@@ -9,7 +9,7 @@ import blackbird.core.managers.AgentManager;
 import blackbird.core.managers.DeviceManager;
 import blackbird.core.managers.HostManager;
 import blackbird.core.managers.LocalHostDeviceManager;
-import blackbird.core.packets.HostIdentificationPacket;
+import blackbird.core.packets.HostIdentification;
 import blackbird.core.util.ConstructionPlan;
 import blackbird.core.util.ValueKeyedMap;
 import org.apache.logging.log4j.LogManager;
@@ -34,20 +34,18 @@ public class Blackbird {
     private List<Decoder> decoders;
     private List<Connector> connectors;
     private HostDevice localDevice;
-    private HostIdentificationPacket ownHandshake;
 
-    private PacketConnection.Listener identificationResponder = new PacketConnection.PacketTypeListener<HostIdentificationPacket>() {
+    private PacketConnection.Listener identificationResponder = new PacketConnection.PacketTypeListener<HostIdentification.Request>() {
+
         @Override
-        public void packetReceived(HostIdentificationPacket packet, PacketReceivedEvent event) {
+        public void packetReceived(HostIdentification.Request packet, PacketReceivedEvent event) {
 
-            if (packet.doAnswer())
-                try {
-                    event.getSource().send(
-                            new HostIdentificationPacket(localDevice)
-                    );
-                } catch (IOException e) {
-                    e.printStackTrace(); //TODO logger
-                }
+            try {
+                event.sendAnswer(new HostIdentification.Reply(getLocalDevice()));
+                System.out.println("identification send" + localDevice);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     };
 
@@ -57,6 +55,7 @@ public class Blackbird {
         deviceManagers = new ValueKeyedMap<>(DeviceManager::getDevice);
         builders = new ArrayList<>(DIBuilderRegistry.getBuilders());
         connectors = new ArrayList<>();
+        decoders = new ArrayList<>();
 
     }
 
@@ -130,8 +129,6 @@ public class Blackbird {
     public void setLocalDevice(HostDevice localDevice) {
 
         this.localDevice = localDevice;
-
-        ownHandshake = new HostIdentificationPacket(localDevice);
     }
 
 
@@ -201,12 +198,18 @@ public class Blackbird {
     }
 
 
+    public PacketConnection.Listener getIdentificationResponder() {
+
+        return identificationResponder;
+    }
+
+
     public void acceptConnection(HostConnection connection) {
 
         connection.addListener(identificationResponder);
 
         try {
-            HostDevice host = HostIdentificationPacket.identify(connection);
+            HostDevice host = HostIdentification.identify(connection);
 
             getHostManager(host).addConnection(connection);
 
@@ -221,5 +224,10 @@ public class Blackbird {
         return interfaceDevice(getLocalDevice(), type);
     }
 
+
+    public void sendDeviceIdentificationTo(HostConnection connection) throws IOException {
+
+        connection.send(new HostIdentification.Reply(getLocalDevice()));
+    }
 
 }

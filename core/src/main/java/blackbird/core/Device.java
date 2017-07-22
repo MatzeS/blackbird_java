@@ -36,13 +36,23 @@ public class Device implements Serializable {
     private Properties uiProperties;
     private DIState state;
 
+
+    @Deprecated
     public Device() {
+
+        this(UUID.randomUUID().toString());
+    }
+
+
+    public Device(String id) {
+
         modules = new HashMap<>();
         uiProperties = new Properties();
         uiProperties.put("iconName", "ic_integrated_circuit");
 
-        setID(UUID.randomUUID().toString());
+        this.id = id;
     }
+
 
     /**
      * The equals property is internally used for device comparison and identification.
@@ -56,58 +66,78 @@ public class Device implements Serializable {
      */
     @Override
     public boolean equals(Object o) {
+
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Device device = (Device) o;
         return com.google.common.base.Objects.equal(id, device.id);
     }
 
+
     public String getID() {
+
         return id;
     }
 
-    public boolean isHost() {
-        return this instanceof HostDevice;
-    }
 
     public void setID(String id) {
 
         this.id = id;
     }
 
+
+    public boolean isHost() {
+
+        return this instanceof HostDevice;
+    }
+
+
     public Device getModule(String identifier) {
+
         return modules.get(identifier);
     }
 
+
     public Map<String, Device> getModules() {
+
         return modules;
     }
 
 
     public Device getSuperModule() {
+
         return superModule;
-    }
-
-    public Properties getUIProperties() {
-        return uiProperties;
-    }
-
-    public String getUIProperty(String key) {
-        return uiProperties.getProperty(key);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
-
-    @Override
-    public String toString() {
-        return this.getClass().getName() + "/" + getID();
     }
 
 
     public void setSuperModule(AVRDevice superModule) {
+
         this.superModule = superModule;
+    }
+
+
+    public Properties getUIProperties() {
+
+        return uiProperties;
+    }
+
+
+    public String getUIProperty(String key) {
+
+        return uiProperties.getProperty(key);
+    }
+
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(id);
+    }
+
+
+    @Override
+    public String toString() {
+
+        return this.getClass().getName() + "/" + getID();
     }
 }

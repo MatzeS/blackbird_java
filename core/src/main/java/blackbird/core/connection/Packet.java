@@ -1,6 +1,7 @@
 package blackbird.core.connection;
 
 import java.io.Serializable;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -31,22 +32,40 @@ public class Packet implements Serializable {
      */
     private UUID answerTo;
 
+
     public Packet(UUID answerTo) {
+
         this.answerTo = answerTo;
     }
+
 
     public Packet() {
+
     }
 
-    public UUID getAnswerTo() {
-        return answerTo;
+
+    public boolean isAnswerTo(Packet packet) {
+
+        return getAnswerTo()
+                .filter(a -> a.equals(packet.getID()))
+                .isPresent();
     }
+
+
+    public Optional<UUID> getAnswerTo() {
+
+        return Optional.ofNullable(answerTo);
+    }
+
 
     public void setAnswerTo(UUID answerTo) {
+
         this.answerTo = answerTo;
     }
 
+
     public UUID getID() {
+
         return ID;
     }
 

@@ -1,5 +1,6 @@
 package blackbird.core.network;
 
+import blackbird.core.HostConnection;
 import blackbird.core.connection.exceptions.NoConnectionException;
 import blackbird.core.connectors.Connector;
 import org.apache.logging.log4j.LogManager;
@@ -19,6 +20,12 @@ public class NetworkConnector extends Connector<InetSocketAddress> {
     private Logger logger = LogManager.getLogger(NetworkConnector.class);
 
     private Server server;
+
+
+    public NetworkConnector() throws IOException {
+
+        this(DEFAULT_NETWORK_PORT);
+    }
 
 
     /**
@@ -154,7 +161,7 @@ public class NetworkConnector extends Connector<InetSocketAddress> {
                             NetworkConnection.getSocketText(socket));
 
                     NetworkConnection networkConnection = connect(socket);
-                    acceptConnection(networkConnection);
+                    acceptConnection(new HostConnection(networkConnection));
 
                 } catch (SocketException e) {
                     // caused by intentional close //TODO

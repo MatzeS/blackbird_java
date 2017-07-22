@@ -22,6 +22,7 @@ import java.util.function.Predicate;
 public abstract class PacketConnection extends Connection {
 
     public static final int DEFAULT_TIMEOUT = 2000;
+    public static final int DEFAULT_RETRIES = 1;
     private Logger logger = LogManager.getLogger(PacketConnection.class);
     /**
      * The delegation object for the connection.
@@ -40,7 +41,7 @@ public abstract class PacketConnection extends Connection {
 
     private static Predicate<Packet> getAnswerFilter(Packet request) {
 
-        return a -> a.getAnswerTo().equals(request.getID());
+        return a -> a.isAnswerTo(request);
     }
 
 
@@ -73,6 +74,7 @@ public abstract class PacketConnection extends Connection {
 
     protected void firePacketReceived(Packet packet) {
 
+        System.out.println("received " + packet.getClass().getSimpleName() + "/" + packet.hashCode());
         logger.trace("received " + packet.getClass().getSimpleName() + "/" + packet.hashCode());
         PacketReceivedEvent e = new PacketReceivedEvent(PacketConnection.this, packet);
         listeners.fire(l -> l.packetReceived(e));
@@ -159,6 +161,7 @@ public abstract class PacketConnection extends Connection {
 
         return (R) sendAndReceive(
                 request,
+                DEFAULT_RETRIES,
                 getTypeFilter(expectedPacketType),
                 timeout
         );
@@ -169,7 +172,10 @@ public abstract class PacketConnection extends Connection {
                                  long timeout)
             throws IOException {
 
-        return sendAndReceive(request, p -> true, timeout);
+        return sendAndReceive(
+                request,
+                DEFAULT_RETRIES,
+                p -> true, timeout);
     }
 
 
@@ -184,16 +190,23 @@ public abstract class PacketConnection extends Connection {
      * @throws IOException      if an IO error occurs.
      */
     public Packet sendAndReceive(Packet request,
+                                 int retries,
                                  Predicate<Packet> filter,
                                  long timeout)
             throws IOException {
 
         SynchronousListener listener = new SynchronousListener(filter);
         addListener(listener);
-        send(request);
-        listener.waitForReply(timeout);
+        Packet reply = null;
+
+        for (int i = 0; i < retries && reply == null; i++) {
+            send(request);
+            listener.waitForReply(timeout);
+            reply = listener.getReplyPacket();
+        }
+
         removeListener(listener);
-        Packet reply = listener.getReplyPacket();
+
         if (reply == null)
             throw new NoReplyException();
         return reply;
@@ -235,6 +248,7 @@ public abstract class PacketConnection extends Connection {
         Predicate<Packet> combined = p -> typeFilter.test(p) && filter.test((R) p);
         return (R) sendAndReceive(
                 request,
+                DEFAULT_RETRIES,
                 combined,
                 timeout
         );
@@ -253,6 +267,7 @@ public abstract class PacketConnection extends Connection {
 
         return sendAndReceive(
                 request,
+                DEFAULT_RETRIES,
                 filter,
                 DEFAULT_TIMEOUT
         );
@@ -260,6 +275,7 @@ public abstract class PacketConnection extends Connection {
 
 
     public <R extends Packet> R sendAndReceiveAnswer(Packet request,
+                                                     int retries,
                                                      Class<R> expectedPacketType,
                                                      Predicate<R> filter,
                                                      long timeout)
@@ -270,6 +286,7 @@ public abstract class PacketConnection extends Connection {
 
         return (R) sendAndReceiveAnswer(
                 request,
+                retries,
                 combined,
                 timeout
         );
@@ -277,12 +294,14 @@ public abstract class PacketConnection extends Connection {
 
 
     public <R extends Packet> R sendAndReceiveAnswer(Packet request,
+                                                     int retries,
                                                      Class<R> expectedPacketType,
                                                      Predicate<R> filter)
             throws IOException {
 
         return sendAndReceiveAnswer(
                 request,
+                retries,
                 expectedPacketType,
                 filter,
                 DEFAULT_TIMEOUT
@@ -291,14 +310,30 @@ public abstract class PacketConnection extends Connection {
 
 
     public <R extends Packet> R sendAndReceiveAnswer(Packet request,
+                                                     int retries,
                                                      Class<R> expectedPacketType,
                                                      long timeout)
             throws IOException {
 
         return (R) sendAndReceiveAnswer(
                 request,
+                retries,
                 getTypeFilter(expectedPacketType),
                 timeout
+        );
+    }
+
+
+    public <R extends Packet> R sendAndReceiveAnswer(Packet request,
+                                                     int retries,
+                                                     Class<R> expectedPacketType)
+            throws IOException {
+
+        return sendAndReceiveAnswer(
+                request,
+                retries,
+                expectedPacketType,
+                DEFAULT_TIMEOUT
         );
     }
 
@@ -309,30 +344,34 @@ public abstract class PacketConnection extends Connection {
 
         return sendAndReceiveAnswer(
                 request,
-                expectedPacketType,
-                DEFAULT_TIMEOUT
+                DEFAULT_RETRIES,
+                expectedPacketType
         );
     }
 
 
     public Packet sendAndReceiveAnswer(Packet request,
+                                       int retries,
                                        long timeout)
             throws IOException {
 
         return sendAndReceiveAnswer(
                 request,
+                retries,
                 p -> true,
                 timeout);
     }
 
 
     public Packet sendAndReceiveAnswer(Packet request,
+                                       int retries,
                                        Predicate<Packet> filter,
                                        long timeout)
             throws IOException {
 
         return sendAndReceive(
                 request,
+                retries,
                 getAnswerFilter(request).and(filter),
                 timeout
         );
@@ -340,11 +379,13 @@ public abstract class PacketConnection extends Connection {
 
 
     public Packet sendAndReceiveAnswer(Packet request,
+                                       int retries,
                                        Predicate<Packet> filter)
             throws IOException {
 
         return sendAndReceiveAnswer(
                 request,
+                retries,
                 filter,
                 DEFAULT_TIMEOUT
         );

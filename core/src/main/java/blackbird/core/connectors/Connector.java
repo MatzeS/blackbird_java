@@ -4,7 +4,7 @@ import blackbird.core.HostConnection;
 import blackbird.core.HostDevice;
 import blackbird.core.connection.Connection;
 import blackbird.core.connection.exceptions.NoConnectionException;
-import blackbird.core.packets.HostIdentificationPacket;
+import blackbird.core.packets.HostIdentification;
 import blackbird.core.util.Generics;
 
 import java.io.IOException;
@@ -15,14 +15,14 @@ import java.util.function.Consumer;
  * since their implementations are only provided locally and
  * cannot be build from remote.
  * <p>
- * Typically the {@link LegacyGenericConnector} is extended.
+ * Typically the {@link } is extended.
  */
 public abstract class Connector<P> {
 
-    private Consumer<Connection> acceptConnectionHandle;
+    private Consumer<HostConnection> acceptConnectionHandle;
 
 
-    public void setAcceptConnectionHandle(Consumer<Connection> handle) {
+    public void setAcceptConnectionHandle(Consumer<HostConnection> handle) {
 
         this.acceptConnectionHandle = handle;
     }
@@ -41,7 +41,7 @@ public abstract class Connector<P> {
      * It should only do so if other possible paths were used meanwhile
      * and the repeated path is corrupted. TODO
      *
-     * @param device the target host
+     * @param parameters the target host
      * @return a connection to the target, not null
      * @throws NoConnectionException if the connection could not be established
      */
@@ -54,7 +54,10 @@ public abstract class Connector<P> {
 
         try {
             HostConnection hostConnection = new HostConnection(connection);
-            HostDevice remoteHost = HostIdentificationPacket.identify(hostConnection);
+            HostDevice remoteHost = HostIdentification.identify(hostConnection);
+
+            System.out.println("remote host" + remoteHost);
+            System.out.println("expected" + device);
 
             if (!remoteHost.equals(device))
                 throw new RuntimeException("inconsistent model, remote host is not expected one");
@@ -77,7 +80,7 @@ public abstract class Connector<P> {
      *
      * @param connection passed to blackbird
      */
-    public void acceptConnection(Connection connection) {
+    public void acceptConnection(HostConnection connection) {
 
         acceptConnectionHandle.accept(connection);
     }

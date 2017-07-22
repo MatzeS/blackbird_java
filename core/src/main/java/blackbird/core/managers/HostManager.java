@@ -10,6 +10,7 @@ import blackbird.core.packets.HostDIRequest;
 import blackbird.core.rmi.RemoteMethodInvocation;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,6 +38,8 @@ public class HostManager extends DeviceManager {
                     "HostManager is only appropriate for a HostDevice");
 
         localDIProvider = new LocalDIProvider();
+
+        connections = new HashMap<>();
     }
 
 
@@ -60,11 +63,17 @@ public class HostManager extends DeviceManager {
                             .collect(Collectors.toList()))
                 try {
                     HostConnection connection = connector.connect(getDevice(), parameter);
+                    blackbird.sendDeviceIdentificationTo(connection);
+                    connection.addListener(blackbird.getIdentificationResponder());
+
                     addConnection(connection);
+
+                    return true;
                 } catch (Exception ignored) { //TODO multiexception
+                    ignored.printStackTrace();
                 }
 
-        throw new RuntimeException("could not connect to host, no connection found"); //TODO text
+        throw new RuntimeException("could not connect to host, no connection found" + getParameters().size()); //TODO text
     }
 
 
@@ -75,7 +84,7 @@ public class HostManager extends DeviceManager {
 
         try {
             HostDIReply reply = getSelectedConnection().sendAndReceiveAnswer(
-                    new HostDIRequest(type), HostDIReply.class);
+                    new HostDIRequest(type), 2, HostDIReply.class); //TODO better give the other time for a handshake
 
             if (reply.getException() != null)
                 throw new RuntimeException("exception during remote implementation", reply.getException()); //TODO
@@ -128,6 +137,7 @@ public class HostManager extends DeviceManager {
 
     public void addConnection(HostConnection connection) {
 
+        System.out.println("added<<<<<<<<<<<<<<<<<<<<<<<<<<");
         connections.put(getParametersFromConnection(connection), connection);
 
         RMI.registerConnection(connection);

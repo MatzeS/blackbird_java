@@ -41,9 +41,10 @@ public abstract class GenericPortDecoder<
     @Override
     public List<CP> decode(HostDevice device, HostDevice.Port port) {
 
-        if (device.getClass().isAssignableFrom(getDeviceType()))
+        if (!getDeviceType().isAssignableFrom(device.getClass()))
             return Collections.emptyList();
-        if (port.getClass().isAssignableFrom(getPortType()))
+
+        if (!getPortType().isAssignableFrom(port.getClass()))
             return Collections.emptyList();
 
         return decodeGeneric((D) device, (P) port);
@@ -52,7 +53,8 @@ public abstract class GenericPortDecoder<
 
     @Override
     public CP encode(Connection connection) {
-        if (connection.getClass().isAssignableFrom(getConnectionType()))
+
+        if (!getConnectionType().isAssignableFrom(connection.getClass()))
             return null;
 
         return encodeGeneric((C) connection);
