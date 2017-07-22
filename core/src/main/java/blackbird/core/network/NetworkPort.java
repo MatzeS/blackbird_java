@@ -1,6 +1,6 @@
 package blackbird.core.network;
 
-import blackbird.core.DPort;
+import blackbird.core.HostDevice;
 import blackbird.core.util.Hex;
 
 import java.net.InetSocketAddress;
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Storing MAC and possible according IP addresses with port.
  */
-public class NetworkPort extends DPort {
+public class NetworkPort extends HostDevice.Port {
 
     private static final long serialVersionUID = 5388626648137321057L;
 

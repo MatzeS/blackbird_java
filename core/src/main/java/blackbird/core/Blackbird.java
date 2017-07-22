@@ -5,6 +5,7 @@ import blackbird.core.connection.Connection;
 import blackbird.core.connection.PacketConnection;
 import blackbird.core.connection.PacketReceivedEvent;
 import blackbird.core.connection.exceptions.NoReplyException;
+import blackbird.core.connectors.Connector;
 import blackbird.core.managers.AgentManager;
 import blackbird.core.managers.DeviceManager;
 import blackbird.core.managers.HostManager;
@@ -36,6 +37,7 @@ public class Blackbird {
     private List<Connector> connectors;
     private HostDevice localDevice;
     private HandshakePacket ownHandshake;
+
     PacketConnection.Listener handshakeResponder = new PacketConnection.Listener() {
         @Override
         public void packetReceived(PacketReceivedEvent event) {
@@ -60,7 +62,8 @@ public class Blackbird {
 
     public void addConnector(Connector connector) {
 
-        connector.setAcceptConnection(this::acceptConnection);
+        connector.setAcceptConnectionHandle(c ->
+                Blackbird.this.acceptConnection((Connection) c));
         connectors.add(connector);
     }
 

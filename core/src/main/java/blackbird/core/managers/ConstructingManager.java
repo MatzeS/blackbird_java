@@ -125,6 +125,7 @@ public abstract class ConstructingManager extends DeviceManager {
 
                         //TODO call after construction/load state
                         //TODO call devicemanager postconstruction
+                        //TODO destroy stack down
 
                         getImplementationStack().push(impl);
 

@@ -1,10 +1,7 @@
 package blackbird.core.network;
 
-import blackbird.core.GenericConnector;
-import blackbird.core.HostDevice;
-import blackbird.core.connection.Connection;
 import blackbird.core.connection.exceptions.NoConnectionException;
-import blackbird.core.util.MultiException;
+import blackbird.core.connectors.Connector;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,14 +10,8 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.List;
 
-/**
- * Consumes {@link NetworkPort}s to establish TCP/IP sockets.
- * Server is setup on port 1337 / DEFAULT_NETWORK_PORT.
- */
-public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> {
+public class NetworkConnector extends Connector<InetSocketAddress> {
 
     public static final int DEFAULT_NETWORK_PORT = 1337;
     public static final int DEFAULT_TIMEOUT = 2000;
@@ -29,13 +20,14 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
 
     private Server server;
 
+
     /**
      * uses DEFAULT_NETWORK_PORT
      *
      * @param serverPort the server socket port
      * @see NetworkConnector#NetworkConnector(int)
      * /
-     * public NetworkConnector() throws IOException {
+     * public LegacyNetworkConnector() throws IOException {
      * this(DEFAULT_NETWORK_PORT);
      * }
      * <p>
@@ -43,23 +35,30 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
      * Creates the connector and starts the server on the given port
      */
     public NetworkConnector(int serverPort) throws IOException {
+
         startServer(serverPort);
     }
 
+
     public Server getServer() {
+
         return server;
     }
+
 
     /**
      * Presetting the timeout with the <code>DEFAULT_TIMEOUT</code>
      *
      * @param socketAddress the socket address to connect to
      * @return the connected connection
-     * @see NetworkConnector#connect(InetSocketAddress, int)
+     * @see LegacyNetworkConnector#connect(InetSocketAddress, int)
      */
+    @Override
     public NetworkConnection connect(InetSocketAddress socketAddress) {
+
         return connect(socketAddress, DEFAULT_TIMEOUT);
     }
+
 
     /**
      * Connects to the given address
@@ -69,6 +68,7 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
      * @return the connected connection
      */
     public NetworkConnection connect(InetSocketAddress socketAddress, int timeout) {
+
         try {
             Socket socket = new Socket();
             socket.connect(socketAddress, timeout);
@@ -78,9 +78,12 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
         }
     }
 
+
     private NetworkConnection connect(Socket socket) throws IOException {
+
         return new NetworkConnection(socket);
     }
+
 
     /**
      * Connects to an address using the DEFAULT_NETWORK_PORT
@@ -89,25 +92,13 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
      * @return connection targeting the given address
      */
     public NetworkConnection connect(String host) {
+
         return connect(new InetSocketAddress(host, DEFAULT_NETWORK_PORT));
     }
 
-    @Override
-    public Connection connectToPort(HostDevice device, NetworkPort port) {
-        List<NoConnectionException> failures = new ArrayList<>();
-
-        for (InetSocketAddress address : port.getSocketAddresses())
-            try {
-                return connect(address);
-            } catch (NoConnectionException e) {
-                failures.add(e);
-            }
-
-        throw new NoConnectionException("could not connect to any socket address\n" +
-                MultiException.generateMultipleExceptionText(failures));
-    }
 
     private void startServer(int port) throws IOException {
+
         try {
             server = new Server(port);
         } catch (IOException e) {
@@ -123,11 +114,13 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
      */
     public class Server extends ServerSocket implements Runnable {
 
-        private Logger logger = LogManager.getLogger(Server.class);
+        private Logger logger = LogManager.getLogger(NetworkConnector.Server.class);
 
         private Thread socketAcceptThread;
 
+
         protected Server(int port) throws IOException {
+
             super(port);
 
             socketAcceptThread = new Thread(this);
@@ -136,8 +129,10 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
             logger.info("opened network server on port " + this.getLocalPort());
         }
 
+
         @Override
         public void close() throws IOException {
+
             logger.trace("closing network server socket");
             super.close();
             try {
@@ -148,8 +143,10 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
             logger.info("closed network server socket successfully");
         }
 
+
         @Override
         public void run() {
+
             while (isBound() && !isClosed()) {
                 try {
                     Socket socket = accept();
@@ -168,5 +165,6 @@ public class NetworkConnector extends GenericConnector<HostDevice, NetworkPort> 
         }
 
     }
+
 
 }

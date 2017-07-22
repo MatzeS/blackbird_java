@@ -17,24 +17,31 @@ public class HostDevice extends Device {
 
     private String id;
 
-    private List<DPort> ports;
+    private List<Port> ports;
+
 
     public HostDevice() {
+
         this.id = UUID.randomUUID().toString();
 
         ports = new ArrayList<>();
     }
 
+
     public HostDevice(String id, String name) {
+
         this();
 
         this.id = id;
         getUIProperties().setProperty("name", name);
     }
 
-    public List<DPort> getPorts() {
+
+    public List<Port> getPorts() {
+
         return ports;
     }
+
 
     /**
      * The host device interface offers basic blackbird functions to other devices.
@@ -52,6 +59,9 @@ public class HostDevice extends Device {
 
         boolean isDeviceLocallyImplemented(Device device);
 
+    }
+
+    public static class Port {
     }
 
 }

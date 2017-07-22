@@ -4,6 +4,7 @@ import blackbird.core.*;
 import blackbird.core.connection.Connection;
 import blackbird.core.connection.Packet;
 import blackbird.core.connection.PacketConnection;
+import blackbird.core.connectors.Connector;
 import blackbird.core.packets.HostDIReply;
 import blackbird.core.packets.HostDIRequest;
 import blackbird.core.rmi.RemoteMethodInvocation;

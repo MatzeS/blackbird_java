@@ -1,7 +1,8 @@
-package blackbird.core;
+package blackbird.core.connectors;
 
 import blackbird.core.connection.Connection;
 import blackbird.core.connection.exceptions.NoConnectionException;
+import blackbird.core.util.Generics;
 
 import java.util.function.Consumer;
 
@@ -10,15 +11,18 @@ import java.util.function.Consumer;
  * since their implementations are only provided locally and
  * cannot be build from remote.
  * <p>
- * Typically the {@link GenericConnector} is extended.
+ * Typically the {@link LegacyGenericConnector} is extended.
  */
-public abstract class Connector {
+public abstract class Connector<P> {
 
-    private Consumer<Connection> acceptConnection;
+    private Consumer<Connection> acceptConnectionHandle;
 
-    public void setAcceptConnection(Consumer<Connection> acceptConnection) {
-        this.acceptConnection = acceptConnection;
+
+    public void setAcceptConnectionHandle(Consumer<Connection> handle) {
+
+        this.acceptConnectionHandle = handle;
     }
+
 
     /**
      * An implementation of this method should return a new connection
@@ -33,11 +37,12 @@ public abstract class Connector {
      * It should only do so if other possible paths were used meanwhile
      * and the repeated path is corrupted. TODO
      *
-     * @param device the target device
+     * @param device the target host
      * @return a connection to the target, not null
      * @throws NoConnectionException if the connection could not be established
      */
-    public abstract Connection connect(HostDevice device);
+    public abstract Connection connect(P parameters);
+
 
     /**
      * This method is used when the connector accepts
@@ -48,10 +53,29 @@ public abstract class Connector {
      * From here the connection is adapted to a host connection
      * and further communication like handshake and so will be done.
      *
-     * @param connection
+     * @param connection passed to blackbird
      */
     public void acceptConnection(Connection connection) {
-        acceptConnection.accept(connection);
+
+        acceptConnectionHandle.accept(connection);
+    }
+
+
+    public boolean accepts(Class<?> parameterType) {
+
+        return getParameterType().isAssignableFrom(parameterType);
+    }
+
+
+    public boolean accepts(Object parameters) {
+
+        return accepts(parameters.getClass());
+    }
+
+
+    public Class<P> getParameterType() {
+
+        return (Class<P>) Generics.getGenericArgument(this, 0);
     }
 
 }

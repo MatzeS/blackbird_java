@@ -14,7 +14,7 @@ import java.util.*;
  * <p>The device object defines values directly bound to the device.<br>
  * Mainly name, perhaps token and UI data (mask values), <br>
  * but also hardware configuration or preset values.
- * Note: Make sure these values do not collide with the {@see DPort} object.</p>
+ * Note: Make sure these values do not collide with the {@see Port} object.</p>
  * <p>
  * Note: Make sure to override the {@see Device#equals} and {@see Device#hashCode} methods.
  */
