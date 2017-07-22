@@ -1,16 +1,15 @@
 package blackbird.core;
 
 import blackbird.core.builders.DIBuilder;
-import blackbird.core.connection.Connection;
 import blackbird.core.connection.PacketConnection;
 import blackbird.core.connection.PacketReceivedEvent;
-import blackbird.core.connection.exceptions.NoReplyException;
 import blackbird.core.connectors.Connector;
+import blackbird.core.connectors.Decoder;
 import blackbird.core.managers.AgentManager;
 import blackbird.core.managers.DeviceManager;
 import blackbird.core.managers.HostManager;
 import blackbird.core.managers.LocalHostDeviceManager;
-import blackbird.core.packets.HandshakePacket;
+import blackbird.core.packets.HostIdentificationPacket;
 import blackbird.core.util.ConstructionPlan;
 import blackbird.core.util.ValueKeyedMap;
 import org.apache.logging.log4j.LogManager;
@@ -28,25 +27,27 @@ import java.util.stream.Collectors;
 //TODO hosthopping
 public class Blackbird {
 
-
-    public static final long DEFAULT_HANDSHAKE_TIMEOUT = 2000;
     private Logger logger = LogManager.getLogger(Blackbird.class);
     private Cluster cluster;
     private ValueKeyedMap<Device, DeviceManager> deviceManagers;
     private List<DIBuilder> builders;
+    private List<Decoder> decoders;
     private List<Connector> connectors;
     private HostDevice localDevice;
-    private HandshakePacket ownHandshake;
+    private HostIdentificationPacket ownHandshake;
 
-    PacketConnection.Listener handshakeResponder = new PacketConnection.Listener() {
+    private PacketConnection.Listener identificationResponder = new PacketConnection.PacketTypeListener<HostIdentificationPacket>() {
         @Override
-        public void packetReceived(PacketReceivedEvent event) {
+        public void packetReceived(HostIdentificationPacket packet, PacketReceivedEvent event) {
 
-            try {
-                event.getSource().send(ownHandshake);
-            } catch (IOException e) {
-                e.printStackTrace(); //TODO logger
-            }
+            if (packet.doAnswer())
+                try {
+                    event.getSource().send(
+                            new HostIdentificationPacket(localDevice)
+                    );
+                } catch (IOException e) {
+                    e.printStackTrace(); //TODO logger
+                }
         }
     };
 
@@ -63,7 +64,7 @@ public class Blackbird {
     public void addConnector(Connector connector) {
 
         connector.setAcceptConnectionHandle(c ->
-                Blackbird.this.acceptConnection((Connection) c));
+                Blackbird.this.acceptConnection((HostConnection) c));
         connectors.add(connector);
     }
 
@@ -130,7 +131,7 @@ public class Blackbird {
 
         this.localDevice = localDevice;
 
-        ownHandshake = new HandshakePacket(localDevice);
+        ownHandshake = new HostIdentificationPacket(localDevice);
     }
 
 
@@ -176,6 +177,12 @@ public class Blackbird {
     }
 
 
+    private HostManager getHostManager(Device device) {
+
+        return (HostManager) getDeviceManager(device);
+    }
+
+
     public Cluster getCluster() {
 
         return cluster;
@@ -188,70 +195,24 @@ public class Blackbird {
     }
 
 
-    private HandshakePacket performHandshake(HostConnection hostConnection, long timeout) throws IOException {
+    public List<Decoder> getDecoders() {
 
-        hostConnection.addListener(handshakeResponder);
-
-        Object lock = new Object();
-
-        final HandshakePacket[] reply = new HandshakePacket[1];
-        hostConnection.addListener(new PacketConnection.PacketTypeListener<HandshakePacket>() {
-
-            @Override
-            public void packetReceived(HandshakePacket packet, PacketReceivedEvent event) {
-
-                reply[0] = packet;
-                synchronized (lock) {
-                    lock.notify();
-                }
-            }
-        });
-
-        hostConnection.send(ownHandshake);
-
-        //noinspection SynchronizationOnLocalVariableOrMethodParameter
-        synchronized (lock) {
-            try {
-                lock.wait(timeout);
-            } catch (InterruptedException ignored) {
-            }
-        }
-
-        hostConnection.removeListener(handshakeResponder);
-
-        if (reply[0] == null)
-            throw new NoReplyException("no handshake received");
-
-        return reply[0];
+        return this.decoders;
     }
 
 
-    private HandshakePacket performHandshake(HostConnection hostConnection) throws IOException {
+    public void acceptConnection(HostConnection connection) {
 
-        return performHandshake(hostConnection, DEFAULT_HANDSHAKE_TIMEOUT);
-    }
+        connection.addListener(identificationResponder);
 
-
-    public HostConnection upgarde(Connection connection) throws IOException {
-
-        HostConnection hostConnection = new HostConnection(connection);
-        HandshakePacket handshakeResult = performHandshake(hostConnection);
-
-        HostDevice remoteDevice = handshakeResult.getDevice();
-        hostConnection.setHost(remoteDevice);
-        return hostConnection;
-    }
-
-
-    public void acceptConnection(Connection connection) {
-
-        HostConnection hostConnection = null;
         try {
-            hostConnection = upgarde(connection);
+            HostDevice host = HostIdentificationPacket.identify(connection);
+
+            getHostManager(host).addConnection(connection);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-        ((HostManager) getDeviceManager(hostConnection.getHost())).setConnection(hostConnection);
     }
 
 

@@ -1,9 +1,13 @@
 package blackbird.core.connectors;
 
+import blackbird.core.HostConnection;
+import blackbird.core.HostDevice;
 import blackbird.core.connection.Connection;
 import blackbird.core.connection.exceptions.NoConnectionException;
+import blackbird.core.packets.HostIdentificationPacket;
 import blackbird.core.util.Generics;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
@@ -42,6 +46,24 @@ public abstract class Connector<P> {
      * @throws NoConnectionException if the connection could not be established
      */
     public abstract Connection connect(P parameters);
+
+
+    public HostConnection connect(HostDevice device, Object parameters) {
+
+        Connection connection = connect((P) parameters);
+
+        try {
+            HostConnection hostConnection = new HostConnection(connection);
+            HostDevice remoteHost = HostIdentificationPacket.identify(hostConnection);
+
+            if (!remoteHost.equals(device))
+                throw new RuntimeException("inconsistent model, remote host is not expected one");
+
+            return hostConnection;
+        } catch (IOException e) {
+            throw new RuntimeException("IO Exception", e);
+        }
+    }
 
 
     /**

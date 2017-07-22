@@ -1,6 +1,7 @@
 package blackbird.core.connectors;
 
 import blackbird.core.HostDevice;
+import blackbird.core.connection.Connection;
 import blackbird.core.util.Generics;
 
 import java.util.Collections;
@@ -9,6 +10,7 @@ import java.util.List;
 public abstract class GenericPortDecoder<
         D extends HostDevice,
         P extends HostDevice.Port,
+        C extends Connection,
         CP> extends PortDecoder<CP> {
 
     public Class<D> getDeviceType() {
@@ -23,10 +25,16 @@ public abstract class GenericPortDecoder<
     }
 
 
+    public Class<C> getConnectionType() {
+
+        return (Class<C>) Generics.getGenericArgument(this, 2);
+    }
+
+
     @Override
     public Class<CP> getParameterType() {
 
-        return (Class<CP>) Generics.getGenericArgument(this, 2);
+        return (Class<CP>) Generics.getGenericArgument(this, 3);
     }
 
 
@@ -41,6 +49,17 @@ public abstract class GenericPortDecoder<
         return decodeGeneric((D) device, (P) port);
     }
 
+
+    @Override
+    public CP encode(Connection connection) {
+        if (connection.getClass().isAssignableFrom(getConnectionType()))
+            return null;
+
+        return encodeGeneric((C) connection);
+    }
+
+
+    public abstract CP encodeGeneric(C connection);
 
     public abstract List<CP> decodeGeneric(D device, P port);
 

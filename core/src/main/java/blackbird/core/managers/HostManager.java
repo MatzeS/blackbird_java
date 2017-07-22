@@ -11,7 +11,9 @@ import blackbird.core.rmi.RemoteMethodInvocation;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 // TODO inject connection
 public class HostManager extends DeviceManager {
@@ -20,7 +22,10 @@ public class HostManager extends DeviceManager {
             new RemoteMethodInvocation("blackbird");
 
     private HostConnection selectedConnection;
-    private List<HostConnection> connections;
+
+    private Map<Object, HostConnection> connections;
+
+    private LocalDIProvider localDIProvider;
 
 
     public HostManager(Blackbird blackbird, Device device) {
@@ -30,47 +35,52 @@ public class HostManager extends DeviceManager {
         if (!(device instanceof HostDevice))
             throw new RuntimeException(
                     "HostManager is only appropriate for a HostDevice");
+
+        localDIProvider = new LocalDIProvider();
     }
 
 
-    protected HostConnection connect() {
+    private List<Object> getParameters() {
 
-        if (selectedConnection != null)
-            return selectedConnection; // TODO ensure working connection
-
-        for (Connector connector : blackbird.getConnectors())
-            try {
-                Connection connection = connector.connect(getDevice());
-
-                HostConnection hostConnection = blackbird.upgarde(connection);
-
-                if (!hostConnection.getHost().equals(device))
-                    throw new RuntimeException( //TODO
-                            "device on other side is not the expected host (inconsistent model)" + hostConnection.getHost());
+        return blackbird.getDecoders().stream().map(decoder -> decoder.decode(getDevice()))
+                .flatMap(List::stream).collect(Collectors.toList());
+    }
 
 
-                return setConnection(hostConnection);
+    protected boolean connect() {
 
-            } catch (Exception ignored) {
-            }
+        if (isConnected())
+            return true; // TODO ensure working connection
 
-        throw new RuntimeException("could not connect to host, no connection found");
+
+        for (Object parameter : getParameters())
+            for (Connector connector :
+                    blackbird.getConnectors().stream()
+                            .filter(c -> c.accepts(parameter))
+                            .collect(Collectors.toList()))
+                try {
+                    HostConnection connection = connector.connect(getDevice(), parameter);
+                    addConnection(connection);
+                } catch (Exception ignored) { //TODO multiexception
+                }
+
+        throw new RuntimeException("could not connect to host, no connection found"); //TODO text
     }
 
 
     @Override
     protected Object extendHandle(Class<?> type) {
 
-        HostConnection connection = connect();
+        connect(); //TODO error
 
         try {
-            HostDIReply reply = connection.sendAndReceiveAnswer(
+            HostDIReply reply = getSelectedConnection().sendAndReceiveAnswer(
                     new HostDIRequest(type), HostDIReply.class);
 
             if (reply.getException() != null)
                 throw new RuntimeException("exception during remote implementation", reply.getException()); //TODO
 
-            return RMI.getRemoteObject(type, connection, reply.getImplID());
+            return RMI.getRemoteObject(type, getSelectedConnection(), reply.getImplID());
 
         } catch (IOException e) {
             throw new RuntimeException("io exception during remote impl request", e); //TODO
@@ -79,9 +89,9 @@ public class HostManager extends DeviceManager {
     }
 
 
-    protected Optional<HostConnection> getConnection() {
+    private HostConnection getSelectedConnection() {
 
-        return Optional.ofNullable(selectedConnection);
+        return selectedConnection;
     }
 
 
@@ -92,24 +102,39 @@ public class HostManager extends DeviceManager {
     }
 
 
-    protected boolean isConnected() {
+    private boolean isConnected() {
 
-        return getConnection().isPresent();
+        return getSelectedConnection() != null;
     }
 
 
-    public HostConnection setConnection(HostConnection connection) {
+    private void selectConnection(HostConnection connection) {
 
-        if (this.selectedConnection != null)
-            RMI.releaseConnection(this.selectedConnection);
+        if (!connections.containsValue(connection))
+            throw new RuntimeException("connection does not belong to this device/manager");
 
         this.selectedConnection = connection;
+    }
 
-        //connection.addListener();
 
-        RMI.registerConnection(this.selectedConnection);
+    public Object getParametersFromConnection(Connection connection) {
 
-        return this.selectedConnection;
+        return blackbird.getDecoders().stream()
+                .map(decoder -> decoder.encode(connection))
+                .filter(Objects::nonNull)
+                .findAny().orElse(connection);
+    }
+
+
+    public void addConnection(HostConnection connection) {
+
+        connections.put(getParametersFromConnection(connection), connection);
+
+        RMI.registerConnection(connection);
+        connection.addListener(localDIProvider);
+
+        if (!isConnected())
+            selectConnection(connection);
     }
 
 
@@ -120,10 +145,11 @@ public class HostManager extends DeviceManager {
 
             try {
 
-                blackbird.interfaceLocalDevice(packet.getType());
+                DInterface impl = (DInterface) blackbird.interfaceLocalDevice(packet.getType());
 
-                //return new HostDIReply(implID);
-                return null;//TODO
+                int ID = RMI.registerObject(impl); //TODO equal register?
+
+                return new HostDIReply(ID);
 
             } catch (Exception e) {
                 //TODO log

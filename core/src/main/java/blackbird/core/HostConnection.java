@@ -25,8 +25,6 @@ public class HostConnection extends PacketConnection implements Runnable {
     private ObjectOutputStream objectOutputStream;
     private DecompressibleInputStream objectInputStream;
 
-    private HostDevice host;
-
     public HostConnection(Connection componentConnection) throws IOException {
         super(componentConnection); // delegate
 
@@ -37,15 +35,6 @@ public class HostConnection extends PacketConnection implements Runnable {
 
         receiveThread = new Thread(this);
         receiveThread.start();
-    }
-
-    public HostDevice getHost() {
-
-        return host;
-    }
-
-    public void setHost(HostDevice host) {
-        this.host = host;
     }
 
     @Override

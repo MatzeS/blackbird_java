@@ -16,6 +16,7 @@ bin/
 ## gradle
 .gradle
 */build/
+*/out/
 
 # OS Files
 

@@ -1,6 +1,7 @@
 package blackbird.core.connectors;
 
 import blackbird.core.HostDevice;
+import blackbird.core.connection.Connection;
 
 import java.util.Collections;
 import java.util.List;
@@ -8,7 +9,8 @@ import java.util.List;
 public abstract class SingleGenericPortDecoder<
         D extends HostDevice,
         P extends HostDevice.Port,
-        CP> extends GenericPortDecoder<D, P, CP> {
+        C extends Connection,
+        CP> extends GenericPortDecoder<D, P, C, CP> {
 
 
     @Override
