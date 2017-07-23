@@ -8,6 +8,8 @@ import blackbird.core.connectors.Connector;
 import blackbird.core.packets.HostDIReply;
 import blackbird.core.packets.HostDIRequest;
 import blackbird.core.rmi.RemoteMethodInvocation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,6 +23,9 @@ public class HostManager extends DeviceManager {
 
     private static final RemoteMethodInvocation RMI =
             new RemoteMethodInvocation("blackbird");
+
+
+    private Logger logger = LogManager.getLogger(this.getClass());
 
     private HostConnection selectedConnection;
 
@@ -137,7 +142,8 @@ public class HostManager extends DeviceManager {
 
     public void addConnection(HostConnection connection) {
 
-        System.out.println("added<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        logger.trace("added connection {}", connection);
+
         connections.put(getParametersFromConnection(connection), connection);
 
         RMI.registerConnection(connection);

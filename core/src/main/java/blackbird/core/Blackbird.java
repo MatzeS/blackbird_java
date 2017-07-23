@@ -42,9 +42,8 @@ public class Blackbird {
 
             try {
                 event.sendAnswer(new HostIdentification.Reply(getLocalDevice()));
-                System.out.println("identification send" + localDevice);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e);
             }
         }
     };
@@ -100,13 +99,16 @@ public class Blackbird {
 
         DeviceManager manager = deviceManagers.get(device);
 
+        //TODO use some factoryhere, also for thelocal device
         if (manager == null) {
             if (device.equals(localDevice))
                 manager = new LocalHostDeviceManager(this, device);
             else if (device instanceof HostDevice)
                 manager = new HostManager(this, device);
             else
-                manager = new AgentManager(this, device); //TODO use some builder here, also for thelocal device
+                manager = new AgentManager(this, device);
+
+            logger.trace("created device manager for {}", device);
             deviceManagers.put(manager);
         }
 
@@ -133,6 +135,8 @@ public class Blackbird {
 
 
     public <T> T interfaceDevice(Device device, Class<T> type) {
+
+        logger.trace("interface device, {} -> {}", device, type.getSimpleName());
 
         return (T) getDeviceManager(device).getHandle(type);
     }
@@ -207,14 +211,13 @@ public class Blackbird {
     public void acceptConnection(HostConnection connection) {
 
         connection.addListener(identificationResponder);
-
         try {
-            HostDevice host = HostIdentification.identify(connection);
 
+            HostDevice host = HostIdentification.identify(connection);
             getHostManager(host).addConnection(connection);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("IO Exception identifying remote host on accepted connection", e);
         }
     }
 

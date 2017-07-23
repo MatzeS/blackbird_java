@@ -1,6 +1,8 @@
 package blackbird.core;
 
 import blackbird.core.device.avr.AVRDevice;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.Serializable;
 import java.util.*;
@@ -20,7 +22,11 @@ import java.util.*;
  */
 public class Device implements Serializable {
 
+    public static final String UI_NAME = "blackbird.core.Device.UI_NAME";
+
     private static final long serialVersionUID = 7683600417241772350L;
+
+    private Logger logger = LogManager.getLogger(this.getClass());
 
     /**
      * The id is used as user reference for a device, it should, but not necessarily has to be unique.
@@ -76,13 +82,22 @@ public class Device implements Serializable {
 
     public String getID() {
 
-        return id;
+        if (id == null) {
+            id = UUID.randomUUID().toString();
+            logger.warn("device has no ID, created UUID {}", id);
+        }
+
+        return getSuperModule()
+                .map(Object::toString)
+                .map(s -> s + ".")
+                .orElse("")
+                + id;
     }
 
 
     public void setID(String id) {
 
-        this.id = id;
+        this.id = id.trim();
     }
 
 
@@ -104,9 +119,9 @@ public class Device implements Serializable {
     }
 
 
-    public Device getSuperModule() {
+    public Optional<Device> getSuperModule() {
 
-        return superModule;
+        return Optional.ofNullable(superModule);
     }
 
 
@@ -122,9 +137,9 @@ public class Device implements Serializable {
     }
 
 
-    public String getUIProperty(String key) {
+    public Optional<String> getUIProperty(String key) {
 
-        return uiProperties.getProperty(key);
+        return Optional.ofNullable(uiProperties.getProperty(key));
     }
 
 
@@ -135,9 +150,16 @@ public class Device implements Serializable {
     }
 
 
+    public String getName() {
+
+        return getUIProperty(UI_NAME).orElse(getID());
+    }
+
+
     @Override
     public String toString() {
 
-        return this.getClass().getName() + "/" + getID();
+        return getName() + "[" + this.getClass().getSimpleName() + "]";
     }
+
 }

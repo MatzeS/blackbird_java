@@ -10,15 +10,18 @@ public abstract class SubModuleBuilder<D extends Device,
 
     @Override
     public boolean filterDevice(D device) {
+
         if (!super.filterDevice(device))
             return false;
 
         return moduleType.isAssignableFrom(device.getSuperModule().getClass());
     }
 
+
     @Override
     public M getModule(D device) {
-        return (M) device.getSuperModule();
+
+        return (M) device.getSuperModule().get();
     }
 
 }
